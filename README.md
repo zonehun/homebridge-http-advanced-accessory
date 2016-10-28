@@ -1,6 +1,7 @@
 # homebridge http everything
 
-Supports all devices on HomeBridge Platform and bridge them to http
+Supports all devices on HomeBridge Platform
+Bridges devices to http
 
 # Installation
 
