@@ -1,7 +1,7 @@
 {
   "name": "homebridge-httpeverything",
-  "version": "0.1.0",
-  "description": "thermostat plugin for homebridge: https://github.com/nfarina/homebridge",
+  "version": "0.1.1",
+  "description": "http plugin for homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
     "homebridge-plugin"
