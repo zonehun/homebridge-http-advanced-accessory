@@ -1,20 +1,68 @@
 {
-    "bridge": {
-        "name": "Homebridge on Mac",
-        "username": "CC:22:9K:B3:CE:30",
-        "port": 51826,
-        "pin": "031-45-154"
-    },
-    
-    "description": "This is an example configuration file with one fake accessory and one fake platform. You can use this as a template for creating your own configuration file containing devices you actually own.",
-
-    "accessories": [
-        {
-            "accessory": "Thermostat",
-            "name": "Thermostat Demo",
-            "apiroute": "http://myurl.com"
-        }
-    ],
-
-    "platforms":[]
+	"bridge": {
+		"name": "Homebridge",
+		"username": "C1:57:5A:EB:CE:30",
+		"port": 51826,
+		"pin": "000-00-000"
+	},
+	"description": "This is an example configuration for the Everything Homebridge plugin",
+	"accessories": [
+		{
+			"accessory": "Everything",
+			"service": "Thermostat",
+			"name": "Thermostat (Maison)",
+			"apiBaseUrl": "http://localhost:8080/thermostat",
+			"apiSuffixUrl": "",
+			"forceRefreshDelay": 2
+		},
+		{
+			"accessory": "Everything",
+			"service": "WindowCovering",
+			"name": "Volet (Salon)",
+			"apiBaseUrl": "http://localhost:8080/window-covering",
+			"apiSuffixUrl": "/0",
+			"forceRefreshDelay": 2
+		},
+		{
+			"accessory": "Everything",
+			"service": "WindowCovering",
+			"name": "Volet (Salle à manger)",
+			"apiBaseUrl": "http://localhost:8080/window-covering",
+			"apiSuffixUrl": "/1",
+			"forceRefreshDelay": 2
+		},
+		{
+			"accessory": "Everything",
+			"service": "WindowCovering",
+			"name": "Volet (Bureau)",
+			"apiBaseUrl": "http://localhost:8080/window-covering",
+			"apiSuffixUrl": "/2",
+			"forceRefreshDelay": 2
+		},
+		{
+			"accessory": "Everything",
+			"service": "WindowCovering",
+			"name": "Volet (Cuisine)",
+			"apiBaseUrl": "http://localhost:8080/window-covering",
+			"apiSuffixUrl": "/3",
+			"forceRefreshDelay": 2
+		},
+				{
+			"accessory": "Everything",
+			"service": "WindowCovering",
+			"name": "Volets (Maison)",
+			"apiBaseUrl": "http://localhost:8080/window-covering",
+			"apiSuffixUrl": "/all",
+			"forceRefreshDelay": 2
+		},
+		{
+			"accessory": "Everything",
+			"service": "HumiditySensor",
+			"name": "Humidité",
+			"apiBaseUrl": "http://localhost:8080/humidity-sensor",
+			"apiSuffixUrl": "",
+			"forceRefreshDelay": 2
+		}
+	],
+	"platforms": []
 }
