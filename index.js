@@ -5,10 +5,10 @@ var pollingtoevent = require('polling-to-event');
 module.exports = function (homebridge) {
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
-	homebridge.registerAccessory("homebridge-everything", "Everything", Everything);
+	homebridge.registerAccessory("homebridge-httpeverything", "Httpeverything", Httpeverything);
 };
 
-function Everything(log, config) {
+function Httpeverything(log, config) {
 	this.log = log;
 	this.name = config.name;
 	this.service = config.service;
@@ -19,7 +19,7 @@ function Everything(log, config) {
 	this.enableSet = true;
 }
 
-Everything.prototype = {
+Httpeverything.prototype = {
 	//Start
 	identify: function (callback) {
 		this.log("Identify requested!");

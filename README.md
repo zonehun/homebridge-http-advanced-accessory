@@ -5,7 +5,7 @@ Supports all devices on HomeBridge Platform and bridge them to http
 # Installation
 
 1. Install homebridge using: npm install -g homebridge
-2. Install this plugin using: npm install -g homebridge-everything
+2. Install this plugin using: npm install -g homebridge-httpeverything
 3. Update your configuration file. See sample-config.json in this repository for a sample. 
 
 # Configuration
@@ -22,7 +22,7 @@ Configuration sample:
 	"description": "This is an example configuration for the Samsung TV homebridge plugin",
 	"accessories": [
 		{
-			"accessory": "Everything",
+			"accessory": "Httpeverything",
 			"service": "Thermostat",
 			"name": "Thermostat (Maison)",
 			"apiBaseUrl": "http://localhost:8080/thermostat",
@@ -30,7 +30,7 @@ Configuration sample:
 			"forceRefreshDelay": 2
 		},
 		{
-			"accessory": "Everything",
+			"accessory": "Httpeverything",
 			"service": "WindowCovering",
 			"name": "Volet (Salon)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
@@ -38,7 +38,7 @@ Configuration sample:
 			"forceRefreshDelay": 2
 		},
 		{
-			"accessory": "Everything",
+			"accessory": "Httpeverything",
 			"service": "WindowCovering",
 			"name": "Volet (Salle à manger)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
@@ -46,7 +46,7 @@ Configuration sample:
 			"forceRefreshDelay": 2
 		},
 		{
-			"accessory": "Everything",
+			"accessory": "Httpeverything",
 			"service": "WindowCovering",
 			"name": "Volet (Bureau)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
@@ -54,7 +54,7 @@ Configuration sample:
 			"forceRefreshDelay": 2
 		},
 		{
-			"accessory": "Everything",
+			"accessory": "Httpeverything",
 			"service": "WindowCovering",
 			"name": "Volet (Cuisine)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
@@ -62,7 +62,7 @@ Configuration sample:
 			"forceRefreshDelay": 2
 		},
 				{
-			"accessory": "Everything",
+			"accessory": "Httpeverything",
 			"service": "WindowCovering",
 			"name": "Volets (Maison)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
@@ -70,7 +70,7 @@ Configuration sample:
 			"forceRefreshDelay": 2
 		},
 		{
-			"accessory": "Everything",
+			"accessory": "Httpeverything",
 			"service": "HumiditySensor",
 			"name": "Humidité",
 			"apiBaseUrl": "http://localhost:8080/humidity-sensor",

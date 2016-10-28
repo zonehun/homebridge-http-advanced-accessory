@@ -1,0 +1,110 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/eric/.nvm/versions/node/v4.2.4/bin/node',
+1 verbose cli   '/Users/eric/.nvm/versions/node/v4.2.4/bin/npm',
+1 verbose cli   'unpublish',
+1 verbose cli   '--force',
+1 verbose cli   'homebridge-everything' ]
+2 info using npm@2.14.12
+3 info using node@v4.2.4
+4 warn using --force I sure hope you know what you are doing.
+5 silly unpublish args[0] homebridge-everything
+6 silly unpublish thing Result {
+6 silly unpublish   raw: 'homebridge-everything',
+6 silly unpublish   scope: null,
+6 silly unpublish   name: 'homebridge-everything',
+6 silly unpublish   rawSpec: '',
+6 silly unpublish   spec: 'latest',
+6 silly unpublish   type: 'tag' }
+7 verbose getPublishConfig null
+8 silly ls normalized homebridge-everything
+9 silly gentlyRm /Users/eric/.npm/homebridge-everything is being purged
+10 verbose gentlyRm don't care about contents; nuking /Users/eric/.npm/homebridge-everything
+11 silly vacuum-fs purging /Users/eric/.npm/homebridge-everything
+12 silly vacuum-fs quitting because other entries in /Users/eric/.npm
+13 silly mapToRegistry name homebridge-everything
+14 silly mapToRegistry using default registry
+15 silly mapToRegistry registry https://registry.npmjs.org/
+16 silly mapToRegistry uri https://registry.npmjs.org/homebridge-everything
+17 verbose get GET as part of write; not caching result
+18 verbose request uri https://registry.npmjs.org/homebridge-everything?write=true
+19 verbose request no auth needed
+20 info attempt registry request try #1 at 13:11:13
+21 verbose request using bearer token for auth
+22 verbose request id 794afdffccb0f72e
+23 http request GET https://registry.npmjs.org/homebridge-everything?write=true
+24 http 200 https://registry.npmjs.org/homebridge-everything?write=true
+25 verbose headers { server: 'CouchDB/1.6.1 (Erlang OTP/R16B03)',
+25 verbose headers   etag: '"DF8RNL1ESV5W16DHQ03ZXD6CE"',
+25 verbose headers   'content-type': 'application/json',
+25 verbose headers   'content-encoding': 'gzip',
+25 verbose headers   'cache-control': 'max-age=0',
+25 verbose headers   'transfer-encoding': 'chunked',
+25 verbose headers   'accept-ranges': 'bytes',
+25 verbose headers   date: 'Fri, 28 Oct 2016 11:11:14 GMT',
+25 verbose headers   via: '1.1 varnish',
+25 verbose headers   connection: 'keep-alive',
+25 verbose headers   'x-served-by': 'cache-cdg8734-CDG',
+25 verbose headers   'x-cache': 'MISS',
+25 verbose headers   'x-cache-hits': '0',
+25 verbose headers   'x-timer': 'S1477653074.196745,VS0,VE397',
+25 verbose headers   vary: 'Accept-Encoding' }
+26 silly get cb [ 200,
+26 silly get   { server: 'CouchDB/1.6.1 (Erlang OTP/R16B03)',
+26 silly get     etag: '"DF8RNL1ESV5W16DHQ03ZXD6CE"',
+26 silly get     'content-type': 'application/json',
+26 silly get     'content-encoding': 'gzip',
+26 silly get     'cache-control': 'max-age=0',
+26 silly get     'transfer-encoding': 'chunked',
+26 silly get     'accept-ranges': 'bytes',
+26 silly get     date: 'Fri, 28 Oct 2016 11:11:14 GMT',
+26 silly get     via: '1.1 varnish',
+26 silly get     connection: 'keep-alive',
+26 silly get     'x-served-by': 'cache-cdg8734-CDG',
+26 silly get     'x-cache': 'MISS',
+26 silly get     'x-cache-hits': '0',
+26 silly get     'x-timer': 'S1477653074.196745,VS0,VE397',
+26 silly get     vary: 'Accept-Encoding' } ]
+27 verbose get saving homebridge-everything to /Users/eric/.npm/registry.npmjs.org/homebridge-everything_3Fwrite_3Dtrue/.cache.json
+28 info unpublish No version specified, removing all
+29 verbose request uri https://registry.npmjs.org/homebridge-everything/-rev/2-0bfb05ab1afb3c6a76eb541c90131101
+30 verbose request sending authorization for write operation
+31 info attempt registry request try #1 at 13:11:14
+32 verbose request using bearer token for auth
+33 http request DELETE https://registry.npmjs.org/homebridge-everything/-rev/2-0bfb05ab1afb3c6a76eb541c90131101
+34 http 400 https://registry.npmjs.org/homebridge-everything/-rev/2-0bfb05ab1afb3c6a76eb541c90131101
+35 verbose headers { 'content-type': 'application/json',
+35 verbose headers   'cache-control': 'max-age=300',
+35 verbose headers   'content-length': '17',
+35 verbose headers   'accept-ranges': 'bytes',
+35 verbose headers   date: 'Fri, 28 Oct 2016 11:11:15 GMT',
+35 verbose headers   via: '1.1 varnish',
+35 verbose headers   connection: 'keep-alive',
+35 verbose headers   'x-served-by': 'cache-cdg8735-CDG',
+35 verbose headers   'x-cache': 'MISS',
+35 verbose headers   'x-cache-hits': '0',
+35 verbose headers   'x-timer': 'S1477653074.793008,VS0,VE871',
+35 verbose headers   vary: 'Accept-Encoding' }
+36 verbose request invalidating /Users/eric/.npm/registry.npmjs.org/homebridge-everything on DELETE
+37 verbose stack Error: Registry returned 400 for DELETE on https://registry.npmjs.org/homebridge-everything/-rev/2-0bfb05ab1afb3c6a76eb541c90131101
+37 verbose stack     at makeError (/Users/eric/.nvm/versions/node/v4.2.4/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:264:12)
+37 verbose stack     at CachingRegistryClient.<anonymous> (/Users/eric/.nvm/versions/node/v4.2.4/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:242:14)
+37 verbose stack     at Request._callback (/Users/eric/.nvm/versions/node/v4.2.4/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:172:14)
+37 verbose stack     at Request.self.callback (/Users/eric/.nvm/versions/node/v4.2.4/lib/node_modules/npm/node_modules/request/request.js:198:22)
+37 verbose stack     at emitTwo (events.js:87:13)
+37 verbose stack     at Request.emit (events.js:172:7)
+37 verbose stack     at Request.<anonymous> (/Users/eric/.nvm/versions/node/v4.2.4/lib/node_modules/npm/node_modules/request/request.js:1082:10)
+37 verbose stack     at emitOne (events.js:82:20)
+37 verbose stack     at Request.emit (events.js:169:7)
+37 verbose stack     at IncomingMessage.<anonymous> (/Users/eric/.nvm/versions/node/v4.2.4/lib/node_modules/npm/node_modules/request/request.js:1009:12)
+38 verbose statusCode 400
+39 verbose pkgid homebridge-everything
+40 verbose cwd /Users/eric/Desktop/domo/homebridge/homebridge-everything
+41 error Darwin 16.1.0
+42 error argv "/Users/eric/.nvm/versions/node/v4.2.4/bin/node" "/Users/eric/.nvm/versions/node/v4.2.4/bin/npm" "unpublish" "--force" "homebridge-everything"
+43 error node v4.2.4
+44 error npm  v2.14.12
+45 error code E400
+46 error Registry returned 400 for DELETE on https://registry.npmjs.org/homebridge-everything/-rev/2-0bfb05ab1afb3c6a76eb541c90131101
+47 error If you need help, you may report this error at:
+47 error     <https://github.com/npm/npm/issues>
+48 verbose exit [ 1, true ]

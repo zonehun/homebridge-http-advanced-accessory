@@ -1,5 +1,5 @@
 {
-  "name": "homebridge-everything",
+  "name": "homebridge-httpeverything",
   "version": "0.1.0",
   "description": "thermostat plugin for homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
@@ -13,16 +13,16 @@
   "author": "Eric Millet",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/emilletfr/homebridge-everything.git"
+    "url": "git+https://github.com/emilletfr/homebridge-httpeverything.git"
   },
   "dependencies": {
     "request": "^2.65.0",
     "polling-to-event": ">=2.0.2"
   },
   "bugs": {
-    "url": "https://github.com/emilletfr/homebridge-everything/issues"
+    "url": "https://github.com/emilletfr/homebridge-httpeverything/issues"
   },
-  "homepage": "https://github.com/emilletfr/homebridge-everything#readme",
+  "homepage": "https://github.com/emilletfr/homebridge-httpeverything#readme",
   "main": "index.js",
   "devDependencies": {},
   "scripts": {
