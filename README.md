@@ -19,7 +19,7 @@ Configuration sample:
 		"port": 51826,
 		"pin": "000-00-000"
 	},
-	"description": "This is an example configuration for the Samsung TV homebridge plugin",
+	"description": "This is an example configuration for the Everything Homebridge plugin",
 	"accessories": [
 		{
 			"accessory": "Httpeverything",
