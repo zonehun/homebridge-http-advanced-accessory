@@ -17,6 +17,8 @@ function Httpeverything(log, config) {
 	this.forceRefreshDelay = config.forceRefreshDelay || 0
 	this.log(this.name, this.apiroute);
 	this.enableSet = true;
+	//this.emitterActionNames = [];
+	this.statusEmitters = [];
 }
 
 Httpeverything.prototype = {
@@ -34,9 +36,10 @@ Httpeverything.prototype = {
 	getServices: function () {
 		var getDispatch = function (callback, characteristic) {
 			var actionName = "get" + characteristic.displayName.replace(/\s/g, '')
+			this.log("getDispatch:actionName: ", actionName); 
 			request.get({ url: this.apiBaseUrl + "/" + actionName + this.apiSuffixUrl }, function (err, response, body) {
 				if (!err && response.statusCode == 200) {
-					this.log("getDispatch:value: ", JSON.parse(body).value);
+					this.log("getDispatch:returnedvalue: ", JSON.parse(body).value);
 					callback(null, JSON.parse(body).value);
 				}
 				else { this.log("Error getting state: %s", actionName, err); callback(err); }
@@ -52,8 +55,8 @@ Httpeverything.prototype = {
 				{
 					if (!err && response.statusCode == 200) 
 					{ 
-						this.log("response success"); 
-						callback(null); 
+					this.log("setDispatch:returnedvalue: ", JSON.parse(body).value);
+					callback(null, JSON.parse(body).value);
 					}
 					else { this.log("Error getting state: %s", actionName, err); callback(err); }
 				}.bind(this));
@@ -122,32 +125,55 @@ Httpeverything.prototype = {
 			characteristic.on('get', counters[characteristicIndex].getter.bind(this))
 			characteristic.on('set', counters[characteristicIndex].setter.bind(this));
 		}
-
+	
 		function makeHelper(characteristic) {
 			return {
 				getter: function (callback) {
-					if (this.forceRefreshDelay == 0) { getDispatch(callback, characteristic); }
+					var actionName = "get" + characteristic.displayName.replace(/\s/g, '')
+				//	console.log("1this.emitterActionNames[actionName]", this.emitterActionNames[actionName])
+					if (this.forceRefreshDelay == 0 /*|| typeof this.emitterActionNames[actionName] != "undefined"*/) { getDispatch(callback, characteristic); }
 					else 
 					{
 						var state = [];
-						var actionName = "get" + characteristic.displayName.replace(/\s/g, '')
 						var url = this.apiBaseUrl + "/" + actionName + this.apiSuffixUrl;
-						var statusemitter = pollingtoevent(function (done) {
+					//	console.log("this.statusEmitters[actionName]", this.statusEmitters[actionName])
+						if (typeof this.statusEmitters[actionName] != "undefined") 
+						{
+							//this.statusEmitters[actionName].pause();
+							this.statusEmitters[actionName].interval.clear();
+						}
+						this.statusEmitters[actionName] = pollingtoevent(function (done) {
 							request.get({ url: this.apiBaseUrl + "/" + actionName + this.apiSuffixUrl }, function (err, response, body) {
-								if (!err && response.statusCode == 200) { done(null, JSON.parse(body).value); }
-								else { done(null, null); }
+								 
+								if (!err && response.statusCode == 200) 
+								{
+								//	this.log("getRafale:actionName:value: ", actionName, JSON.parse(body).value);
+									 done(null, JSON.parse(body).value); 
+									}
+								else 
+								{ 
+								//	this.log("getRafale:actionName:value: ERROR", actionName);
+									done(null, null); 
+								}
 							}.bind(this));
 						}.bind(this), { longpolling: true, interval: this.forceRefreshDelay*1000, longpollEventName: actionName });
 
-						statusemitter.on(actionName, function (data) 
+						this.statusEmitters[actionName].on(actionName, function (data) 
 						{
+						//	if (typeof this.emitterActionNames[actionName] == "undefined")
+						//	{
+
+						//	console.log("2statusemitter.on(actionName, function (data) ", this.emitterActionNames[actionName]);
 							this.enableSet = false;
-							state[actionName] = data
+							state[actionName] = data;
+						//	this.emitterActionNames[actionName] = data;
 							characteristic.setValue(data);
 							this.enableSet = true;
-						});
+						//	}
+						}.bind(this));
 
 						callback(null, state[actionName]);
+					//	callback(null, this.emitterActionNames[actionName]);
 					}
 				},
 				setter: function (value, callback) { setDispatch(value, callback, characteristic) }
