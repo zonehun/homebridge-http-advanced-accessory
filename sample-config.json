@@ -1,7 +1,7 @@
 {
 	"bridge": {
 		"name": "Homebridge",
-		"username": "C1:38:5A:AC:39:30",
+		"username": "C1:38:5A:AC:39:40",
 		"port": 51826,
 		"pin": "000-00-000"
 	},
@@ -13,7 +13,7 @@
 			"name": "Thermostat (Maison)",
 			"apiBaseUrl": "http://localhost:8080/thermostat",
 			"apiSuffixUrl": "",
-			"forceRefreshDelay": 5
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -21,7 +21,7 @@
 			"name": "Volet (Salon)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
 			"apiSuffixUrl": "/0",
-			"forceRefreshDelay": 5
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -29,7 +29,7 @@
 			"name": "Volet (Salle à manger)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
 			"apiSuffixUrl": "/1",
-			"forceRefreshDelay": 5
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -37,7 +37,7 @@
 			"name": "Volet (Bureau)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
 			"apiSuffixUrl": "/2",
-			"forceRefreshDelay": 5
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -45,7 +45,7 @@
 			"name": "Volet (Cuisine)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
 			"apiSuffixUrl": "/3",
-			"forceRefreshDelay": 5
+			"forceRefreshDelay": 0
 		},
 				{
 			"accessory": "Httpeverything",
@@ -53,7 +53,7 @@
 			"name": "Volets (Maison)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
 			"apiSuffixUrl": "/all",
-			"forceRefreshDelay": 5
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -61,7 +61,7 @@
 			"name": "Humidité",
 			"apiBaseUrl": "http://localhost:8080/humidity-sensor",
 			"apiSuffixUrl": "",
-			"forceRefreshDelay": 5
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -69,7 +69,7 @@
 			"name": "Temp. Ext.",
 			"apiBaseUrl": "http://localhost:8080/temperature-sensor",
 			"apiSuffixUrl": "",
-			"forceRefreshDelay": 5
+			"forceRefreshDelay": 0
 		}
 		
 		
