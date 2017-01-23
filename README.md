@@ -13,9 +13,10 @@ Supports all devices on HomeBridge Platform / Bridges devices to http
 Configuration sample:
 
  ```
-   "bridge": {
+ {
+	"bridge": {
 		"name": "Homebridge",
-		"username": "C1:57:5A:EB:CE:30",
+		"username": "C1:38:5A:AC:39:30",
 		"port": 51826,
 		"pin": "000-00-000"
 	},
@@ -27,7 +28,7 @@ Configuration sample:
 			"name": "Thermostat (Maison)",
 			"apiBaseUrl": "http://localhost:8080/thermostat",
 			"apiSuffixUrl": "",
-			"forceRefreshDelay": 2
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -35,7 +36,7 @@ Configuration sample:
 			"name": "Volet (Salon)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
 			"apiSuffixUrl": "/0",
-			"forceRefreshDelay": 2
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -43,7 +44,7 @@ Configuration sample:
 			"name": "Volet (Salle à manger)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
 			"apiSuffixUrl": "/1",
-			"forceRefreshDelay": 2
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -51,7 +52,7 @@ Configuration sample:
 			"name": "Volet (Bureau)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
 			"apiSuffixUrl": "/2",
-			"forceRefreshDelay": 2
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -59,15 +60,15 @@ Configuration sample:
 			"name": "Volet (Cuisine)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
 			"apiSuffixUrl": "/3",
-			"forceRefreshDelay": 2
+			"forceRefreshDelay": 0
 		},
 				{
 			"accessory": "Httpeverything",
 			"service": "WindowCovering",
-			"name": "Volets (Maison)",
+			"name": "Volet (Chambre)",
 			"apiBaseUrl": "http://localhost:8080/window-covering",
-			"apiSuffixUrl": "/all",
-			"forceRefreshDelay": 2
+			"apiSuffixUrl": "/4",
+			"forceRefreshDelay": 0
 		},
 		{
 			"accessory": "Httpeverything",
@@ -75,8 +76,27 @@ Configuration sample:
 			"name": "Humidité",
 			"apiBaseUrl": "http://localhost:8080/humidity-sensor",
 			"apiSuffixUrl": "",
-			"forceRefreshDelay": 2
+			"forceRefreshDelay": 0
+		},
+		{
+			"accessory": "Httpeverything",
+			"service": "TemperatureSensor",
+			"name": "Temp. Ext.",
+			"apiBaseUrl": "http://localhost:8080/temperature-sensor",
+			"apiSuffixUrl": "",
+			"forceRefreshDelay": 0
 		}
+		,
+		{
+			"accessory": "Httpeverything",
+			"service": "Switch",
+			"name": "Force Chauffe-eau",
+			"apiBaseUrl": "http://localhost:8080/force-hot-water",
+			"apiSuffixUrl": "",
+			"forceRefreshDelay": 0
+		}
+		
+		
 	],
 	"platforms": []
 }
