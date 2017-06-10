@@ -1,31 +1,23 @@
 {
-  "name": "homebridge-httpeverything",
-  "version": "0.1.33",
+  "name": "homebridge-http-accessory",
+  "version": "1.0.0",
   "description": "http plugin for homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin accessory"
   ],
   "engines": {
     "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
+    "homebridge": ">=0.4.0"
   },
-  "author": "Eric Millet",
+  "author": "tasict",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/emilletfr/homebridge-httpeverything.git"
+    "url": "git+https://github.com/tasict/homebridge-http-accessory"
   },
   "dependencies": {
     "request": "^2.65.0",
     "polling-to-event": ">=2.0.2"
   },
-  "bugs": {
-    "url": "https://github.com/emilletfr/homebridge-httpeverything/issues"
-  },
-  "homepage": "https://github.com/emilletfr/homebridge-httpeverything#readme",
-  "main": "index.js",
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  }
+  "homepage": "https://github.com/tasict/homebridge-http-accessory#readme"
 }

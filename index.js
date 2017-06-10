@@ -5,10 +5,10 @@ var pollingtoevent = require('polling-to-event');
 module.exports = function (homebridge) {
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
-	homebridge.registerAccessory("homebridge-httpeverything", "Httpeverything", Httpeverything);
+	homebridge.registerAccessory("homebridge-accessory", "HttpAccessory", HttpAccessory);
 };
 
-function Httpeverything(log, config) {
+function HttpAccessory(log, config) {
 	this.log = log;
 	this.name = config.name;
 	this.service = config.service;
@@ -22,7 +22,7 @@ function Httpeverything(log, config) {
 	this.statusEmitters = [];
 }
 
-Httpeverything.prototype = {
+HttpAccessory.prototype = {
 	//Start
 	identify: function (callback) {
 		this.log("Identify requested!");
@@ -68,9 +68,9 @@ Httpeverything.prototype = {
 		var informationService = new Service.AccessoryInformation();
 
 		informationService
-			.setCharacteristic(Characteristic.Manufacturer, "HTTP Manufacturer")
-			.setCharacteristic(Characteristic.Model, "HTTP Model")
-			.setCharacteristic(Characteristic.SerialNumber, "HTTP Serial Number");
+			.setCharacteristic(Characteristic.Manufacturer, "Custom Manufacturer")
+			.setCharacteristic(Characteristic.Model, "HTTP Accessory Model")
+			.setCharacteristic(Characteristic.SerialNumber, "HTTP Accessory Serial Number");
 
 		var newService = null
 		switch (this.service) {
@@ -142,6 +142,8 @@ Httpeverything.prototype = {
 			optionCounters[characteristicIndex] = makeHelper(characteristic);
 			characteristic.on('get', optionCounters[characteristicIndex].getter.bind(this))
 			characteristic.on('set', optionCounters[characteristicIndex].setter.bind(this));
+
+			newService.addCharacteristic(characteristic);
 		}
 	
 		function makeHelper(characteristic) {
