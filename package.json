@@ -1,10 +1,10 @@
 {
   "name": "homebridge-http-accessory",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "http plugin for homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
-    "homebridge-plugin accessory"
+    "homebridge-plugin"
   ],
   "engines": {
     "node": ">=0.12.0",
