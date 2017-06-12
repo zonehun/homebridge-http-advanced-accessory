@@ -1,10 +1,15 @@
 var Service, Characteristic;
 var request = require("request");
 var pollingtoevent = require('polling-to-event');
+var homekitExtensions = require('./homekit-extensions.js'),
 
 module.exports = function (homebridge) {
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
+	
+	ServiceEx = homekitExtensions.Service;
+	CharacteristicExt = homekitExtensions.Characteristic;
+
 	homebridge.registerAccessory("homebridge-http-accessory", "HttpAccessory", HttpAccessory);
 };
 
@@ -87,6 +92,7 @@ HttpAccessory.prototype = {
 			case "Door": newService = new Service.Door(this.name); break;
 			case "Doorbell": newService = new Service.Doorbell(this.name); break;
 			case "Fan": newService = new Service.Fan(this.name); break;
+			case "Fan2": newService = new Service.Fan2(this.name); break;
 			case "GarageDoorOpener": newService = new Service.GarageDoorOpener(this.name); break;
 			case "HumiditySensor": newService = new Service.HumiditySensor(this.name); break;
 			case "LeakSensor": newService = new Service.LeakSensor(this.name); break;
@@ -113,6 +119,8 @@ HttpAccessory.prototype = {
 			case "TunneledBTLEAccessoryService": newService = new Service.TunneledBTLEAccessoryService(this.name); break;
 			case "Window": newService = new Service.Window(this.name); break;
 			case "WindowCovering": newService = new Service.WindowCovering(this.name); break;
+			case "FanIR": newService = new ServiceEx.FanIR(this.name); break;
+			case "TVIR": newService = new ServiceEx.TVIR(this.name); break;
 			default: newService = null
 		}
 
