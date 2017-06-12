@@ -3,7 +3,6 @@
 
 const Characteristic = require('hap-nodejs').Characteristic;
 
-
 /**
  * Characteristic "PushOn"
  */
