@@ -6,9 +6,6 @@ var homekitExtensions = require('./homekit-extensions.js');
 module.exports = function (homebridge) {
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
-	
-	ServiceEx = homekitExtensions.Service;
-	CharacteristicExt = homekitExtensions.Characteristic;
 
 	homebridge.registerAccessory("homebridge-http-accessory", "HttpAccessory", HttpAccessory);
 };
@@ -119,8 +116,8 @@ HttpAccessory.prototype = {
 			case "TunneledBTLEAccessoryService": newService = new Service.TunneledBTLEAccessoryService(this.name); break;
 			case "Window": newService = new Service.Window(this.name); break;
 			case "WindowCovering": newService = new Service.WindowCovering(this.name); break;
-			case "FanIR": newService = new ServiceEx.FanIR(this.name); break;
-			case "TVIR": newService = new ServiceEx.TVIR(this.name); break;
+			case "FanIR": newService = new Service.FanIR(this.name); break;
+			case "TVIR": newService = new Service.TVIR(this.name); break;
 			default: newService = null
 		}
 
