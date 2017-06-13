@@ -83,6 +83,7 @@ const MuteIRUUID = 'be9ac772-4f43-11e7-b114-b2f933d5fe66';
 Characteristic.MuteIR = function() {
 
   Characteristic.call(this, 'Mute', MuteIRUUID);
+  
   this.setProps({
     format: Characteristic.Formats.BOOL,
     perms: [Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
@@ -91,7 +92,7 @@ Characteristic.MuteIR = function() {
 
 };
 
-inherits(Characteristic.VolumeIR, Characteristic);
+inherits(Characteristic.MuteIR, Characteristic);
 
 Characteristic.MuteIR.UUID = MuteIRUUID;
 
@@ -106,10 +107,10 @@ Service.FanIR = function(displayName, subtype) {
   Service.call(this, displayName, FanIRUUID, subtype);
 
   // Required Characteristics
-  this.addCharacteristic(PushOn);
+  this.addCharacteristic(Characteristic.PushOn);
 
   // Optional Characteristics
-  this.addOptionalCharacteristic(RotationSpeedIR);
+  this.addOptionalCharacteristic(Characteristic.RotationSpeedIR);
 
 
 };
@@ -127,13 +128,17 @@ const TVIRUUID = 'be9ac984-4f43-11e7-b114-b2f933d5fe66';
 Service.TVIR = function(displayName, subtype) {
   Service.call(this, displayName, TVIRUUID, subtype);
 
-  this.addCharacteristic(PushOn);
+  this.addCharacteristic(Characteristic.PushOn);
 
   // Optional Characteristics
-  this.addOptionalCharacteristic(VolumeIR);
-  this.addOptionalCharacteristic(MuteIR);
+  this.addOptionalCharacteristic(Characteristic.VolumeIR);
+  this.addOptionalCharacteristic(Characteristic.MuteIR);
 
 };
 
 inherits(Service.TVIR, Service);
 
+module.exports = {
+  Service : Service,
+  Characteristic : Characteristic
+};
