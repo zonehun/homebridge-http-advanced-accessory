@@ -116,8 +116,8 @@ HttpAccessory.prototype = {
 			case "TunneledBTLEAccessoryService": newService = new Service.TunneledBTLEAccessoryService(this.name); break;
 			case "Window": newService = new Service.Window(this.name); break;
 			case "WindowCovering": newService = new Service.WindowCovering(this.name); break;
-			case "FanIR": newService = new Service.FanIR(this.name); break;
-			case "TVIR": newService = new Service.TVIR(this.name); break;
+			case "FanIR": newService = new HomeKitExtensions.Service.FanIR(this.name); break;
+			case "TVIR": newService = new HomeKitExtensions.Service.TVIR(this.name); break;
 			default: newService = null
 		}
 
