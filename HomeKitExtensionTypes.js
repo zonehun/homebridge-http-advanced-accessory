@@ -12,7 +12,7 @@ var Service = require('hap-nodejs').Service;
 const PushOnUUID = '74fefc26-4f40-11e7-b114-b2f933d5fe66';
 
 Characteristic.PushOn = function() {
-  Characteristic.call(this, 'Push On', PushOnUUID);
+  Characteristic.call(this, 'On', PushOnUUID);
   this.setProps({
     format: Characteristic.Formats.BOOL,
     perms: [Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
@@ -32,16 +32,16 @@ const RotationSpeedIRUUID = '74ff01ee-4f40-11e7-b114-b2f933d5fe66';
 
 Characteristic.RotationSpeedIR = function() {
 
-  Characteristic.call(this, 'Rotation Speed IR', RotationSpeedIRUUID);
+  Characteristic.call(this, 'Rotation Speed', RotationSpeedIRUUID);
   this.setProps({
     format: Characteristic.Formats.FLOAT,
     unit: Characteristic.Units.PERCENTAGE,
-    maxValue: 8,
+    maxValue: 2,
     minValue: 0,
     minStep: 1,
     perms: [Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
-  this.value = 4
+  this.value = 1;
 
 };
 
@@ -57,16 +57,16 @@ const VolumeIRUUID = 'be9ac330-4f43-11e7-b114-b2f933d5fe66';
 
 Characteristic.VolumeIR = function() {
 
-  Characteristic.call(this, 'Volume IR', VolumeIRUUID);
+  Characteristic.call(this, 'Volume', VolumeIRUUID);
   this.setProps({
     format: Characteristic.Formats.FLOAT,
     unit: Characteristic.Units.PERCENTAGE,
-    maxValue: 100,
+    maxValue: 2,
     minValue: 0,
     minStep: 1,
     perms: [Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
-  this.value = 50;
+  this.value = 1;
 
 };
 
@@ -82,7 +82,7 @@ const MuteIRUUID = 'be9ac772-4f43-11e7-b114-b2f933d5fe66';
 
 Characteristic.MuteIR = function() {
 
-  Characteristic.call(this, 'Mute IR', MuteIRUUID);
+  Characteristic.call(this, 'Mute', MuteIRUUID);
   this.setProps({
     format: Characteristic.Formats.BOOL,
     perms: [Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
