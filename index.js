@@ -1,14 +1,76 @@
 var Service, Characteristic;
 var request = require("request");
+var xpath = require("xpath");
+var dom = require("xmldom").DOMParser;
 var pollingtoevent = require('polling-to-event');
-var HomeKitExtensions = require('./HomeKitExtensionTypes.js');
 
 module.exports = function (homebridge) {
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
-	
 	homebridge.registerAccessory("homebridge-http-accessory", "HttpAccessory", HttpAccessory);
 };
+
+/**
+ * Mapper class that can be used as a dictionary for mapping one value to another
+ *
+ * @param {Object} parameters The parameters of the mapper
+ * @constructor
+ */
+function StaticMapper(parameters) {
+	var self = this;
+	self.mapping = parameters.mapping;
+
+	self.map = function(value) {
+		return self.mapping[value] || value;
+	};
+}
+
+/**
+ * Mapper class that can extract a part of the string using a regex
+ *
+ * @param {Object} parameters The parameters of the mapper
+ * @constructor
+ */
+function RegexMapper(parameters) {
+	var self = this;
+	self.regexp = new RegExp(parameters.regexp);
+	self.capture = parameters.capture || "1";
+
+	self.map = function(value) {
+		var matches = self.regexp.exec(value);
+
+		if (matches !== null && self.capture in matches) {
+			return matches[self.capture];
+		}
+
+		return value;
+	};
+}
+
+/**
+ * Mapper class that uses XPath to select the text of a node or the value of an attribute
+ *
+ * @param {Object} parameters The parameters of the mapper
+ * @constructor
+ */
+function XPathMapper(parameters) {
+	var self = this;
+	self.xpath = parameters.xpath;
+	self.index = parameters.index || 0;
+
+	self.map = function(value) {
+		var document = new dom().parseFromString(value);
+		var result  = xpath.select(this.xpath, document);
+
+		if (typeof result == "string") {
+			return result;
+		} else if (result instanceof Array && result.length > self.index) {
+			return result[self.index].data;
+		}
+
+		return value;
+	};
+}
 
 function HttpAccessory(log, config) {
 	this.log = log;
@@ -22,9 +84,103 @@ function HttpAccessory(log, config) {
 	this.enableSet = true;
 	//this.emitterActionNames = [];
 	this.statusEmitters = [];
+	// process the mappers
+	var self = this;
+	self.debug = config.debug;
+	self.mappers = [];
+	if (config.mappers) {
+		config.mappers.forEach(function(matches) {
+			switch (matches.type) {
+				case "regex":
+					self.mappers.push(new RegexMapper(matches.parameters));
+					break;
+				case "static":
+					self.mappers.push(new StaticMapper(matches.parameters));
+					break;
+				case "xpath":
+					self.mappers.push(new XPathMapper(matches.parameters));
+					break;
+			}
+		});
+	}
+	if(config.urls)
+		self.urls = config.urls;
+	self.httpMethod = config["http_method"] || "GET";
+	self.auth = {
+		username: config.username || "",
+		password: config.password || "",
+		immediately: true
+	};
+
+	if ("immediately" in config) {
+		self.auth.immediately = config.immediately;
+	}
+
+
 }
 
+
+
 HttpAccessory.prototype = {
+	/**
+ * Logs a message to the HomeBridge log
+ *
+ * Only logs the message if the debug flag is on.
+ */
+	debugLog : function () {
+		if (this.debug) {
+			this.log.apply(this, arguments);
+		}
+	},
+/**
+ * Method that performs a HTTP request
+ *
+ * @param url The URL to hit
+ * @param body The body of the request
+ * @param callback Callback method to call with the result or error (error, response, body)
+ */
+	httpRequest : function(url, body, callback) {
+		request({
+			url: url,
+			body: body,
+			method: this.httpMethod,
+			auth: {
+				user: this.auth.username,
+				pass: this.auth.password,
+				sendImmediately: this.auth.immediately
+			},
+			headers: {
+				Authorization: "Basic " + new Buffer(this.auth.username + ":" + this.auth.password).toString("base64")
+			}
+		},
+		function(error, response, body) {
+			callback(error, response, body)
+		});
+	},
+
+/**
+ * Applies the mappers to the state string received
+ *
+ * @param {string} string The string to apply the mappers to
+ * @returns {string} The modified string after all mappers have been applied
+ */
+	applyMappers : function(string) {
+		var self = this;
+
+		if (self.mappers.length > 0) {
+			self.debugLog("Applying mappers on " + string);
+			self.mappers.forEach(function (mapper, index) {
+				var newString = mapper.map(string);
+				self.debugLog("Mapper " + index + " mapped " + string + " to " + newString);
+				string = newString;
+			});
+
+			self.debugLog("Mapping result is " + string);
+		}
+
+		return string;
+	},
+
 	//Start
 	identify: function (callback) {
 		this.log("Identify requested!");
@@ -38,15 +194,25 @@ HttpAccessory.prototype = {
 	
 	getServices: function () {
 		var getDispatch = function (callback, characteristic) {
-			var actionName = "get" + characteristic.displayName.replace(/\s/g, '')
-			this.log("getDispatch:actionName: ", actionName); 
-			request.get({ url: this.apiBaseUrl + "/" + actionName + this.apiSuffixUrl }, function (err, response, body) {
-				if (!err && response.statusCode == 200) {
-					this.log("getDispatch:returnedvalue: ", JSON.parse(body).value);
-					callback(null, JSON.parse(body).value);
+			var actionName = "get" + characteristic.displayName.replace(/\s/g, '');
+			var self = this;
+			var url = self.urls[actionName];
+			this.log("getDispatch:actionName:url", actionName, url); 
+			if (!url) {
+				callback(null);
+			}
+
+			this.httpRequest(url, "", function(error, response, responseBody) {
+				if (error) {
+					this.log("GetState function failed: %s", error.message);
+					callback(error);
+				} else {
+					var state = responseBody;
+					state = this.applyMappers(state);
+					callback(null, parseInt(state));
 				}
-				else { this.log("Error getting state: %s", actionName, err); callback(err); }
 			}.bind(this));
+
 		}.bind(this);
 
 		var setDispatch = function (value, callback, characteristic) {
@@ -89,7 +255,6 @@ HttpAccessory.prototype = {
 			case "Door": newService = new Service.Door(this.name); break;
 			case "Doorbell": newService = new Service.Doorbell(this.name); break;
 			case "Fan": newService = new Service.Fan(this.name); break;
-			case "Fan2": newService = new Service.Fan2(this.name); break;
 			case "GarageDoorOpener": newService = new Service.GarageDoorOpener(this.name); break;
 			case "HumiditySensor": newService = new Service.HumiditySensor(this.name); break;
 			case "LeakSensor": newService = new Service.LeakSensor(this.name); break;
@@ -116,8 +281,6 @@ HttpAccessory.prototype = {
 			case "TunneledBTLEAccessoryService": newService = new Service.TunneledBTLEAccessoryService(this.name); break;
 			case "Window": newService = new Service.Window(this.name); break;
 			case "WindowCovering": newService = new Service.WindowCovering(this.name); break;
-			case "FanIR": newService = new HomeKitExtensions.Service.FanIR(this.name); break;
-			case "TVIR": newService = new HomeKitExtensions.Service.TVIR(this.name); break;
 			default: newService = null
 		}
 
@@ -167,20 +330,24 @@ HttpAccessory.prototype = {
 							//this.statusEmitters[actionName].pause();
 							this.statusEmitters[actionName].interval.clear();
 						}
+						var self = this;
 						this.statusEmitters[actionName] = pollingtoevent(function (done) {
-							request.get({ url: this.apiBaseUrl + "/" + actionName + this.apiSuffixUrl }, function (err, response, body) {
-								 
-								if (!err && response.statusCode == 200) 
-								{
-								//	this.log("getRafale:actionName:value: ", actionName, JSON.parse(body).value);
-									 done(null, JSON.parse(body).value); 
-									}
-								else 
-								{ 
-								//	this.log("getRafale:actionName:value: ERROR", actionName);
-									done(null, null); 
+							var url = self.urls[actionName];
+							if (!url) {
+								callback(null);
+							}
+
+							this.httpRequest(url, "", function(error, response, responseBody) {
+								if (error) {
+									this.log("GetState function failed: %s", error.message);
+									done(error);
+								} else {
+									var state = responseBody;
+									state = this.applyMappers(state);
+									done(null, parseInt(state));
 								}
 							}.bind(this));
+
 						}.bind(this), { longpolling: true, interval: this.forceRefreshDelay*1000, longpollEventName: actionName });
 
 						this.statusEmitters[actionName].on(actionName, function (data) 
