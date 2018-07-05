@@ -18,7 +18,9 @@
   "dependencies": {
     "request": "^2.65.0",
     "polling-to-event": ">=2.0.2",
-    "hap-nodejs": ">=0.4.25"
+    "hap-nodejs": ">=0.4.25",
+    "xmldom": "^0.1.27",
+    "xpath": "0.0.24"
   },
-  "homepage": "https://github.com/tasict/homebridge-http-accessory#readme"
+  "homepage": "https://github.com/staromeste/homebridge-http-accessory#readme"
 }
