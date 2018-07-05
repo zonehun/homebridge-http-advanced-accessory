@@ -76,36 +76,61 @@ function HttpAccessory(log, config) {
 	this.log = log;
 	this.name = config.name;
 	this.service = config.service;
-	this.apiBaseUrl = config.apiBaseUrl;
-	this.apiSuffixUrl = config.apiSuffixUrl || "";
 	this.optionCharacteristic = config.optionCharacteristic || [];
 	this.forceRefreshDelay = config.forceRefreshDelay || 0;
 	this.log(this.name, this.apiroute);
 	this.enableSet = true;
-	//this.emitterActionNames = [];
 	this.statusEmitters = [];
 	// process the mappers
 	var self = this;
 	self.debug = config.debug;
-	self.mappers = [];
-	if (config.mappers) {
-		config.mappers.forEach(function(matches) {
-			switch (matches.type) {
-				case "regex":
-					self.mappers.push(new RegexMapper(matches.parameters));
-					break;
-				case "static":
-					self.mappers.push(new StaticMapper(matches.parameters));
-					break;
-				case "xpath":
-					self.mappers.push(new XPathMapper(matches.parameters));
-					break;
+	/**
+	 * self.urls ={
+	 *	getStatus : {
+	 *		url:"http://",
+	 *		httpMethod:"",
+	 *		mappers : []
+	 *	},
+	 *	getTemp : {
+	 *		url:"http://",
+	 *		httpMethod:"",
+	 *		mappers : []
+	 *	},
+	 *  setTemp : {
+	 * 		url:"http://{value}",
+	 * 		httpMethod:"",
+	 *      body:"{value}",
+	 * 		mappers : []
+	 * }
+	 *}
+	 */
+	self.urls ={};
+	if(config.urls){
+		for (var actionName in config.urls){
+			if(!config.urls.hasOwnProperty(actionName)) continue;
+			self.urls[actionName] = {};
+			self.urls[actionName].url = config.urls[actionName].url;
+			self.urls[actionName].httpMethod = config.urls[actionName].httpMethod || "GET";
+			self.urls[actionName].body = config.urls[actionName].body || "";
+			if (config.urls[actionName].mappers) {
+				self.urls[actionName].mappers = [];
+				config.urls[actionName].mappers.forEach(function(matches) {
+					switch (matches.type) {
+						case "regex":
+							self.urls[actionName].mappers.push(new RegexMapper(matches.parameters));
+							break;
+						case "static":
+							self.urls[actionName].mappers.push(new StaticMapper(matches.parameters));
+							break;
+						case "xpath":
+							self.urls[actionName].mappers.push(new XPathMapper(matches.parameters));
+							break;
+					}
+				});
 			}
-		});
+		}
+
 	}
-	if(config.urls)
-		self.urls = config.urls;
-	self.httpMethod = config["http_method"] || "GET";
 	self.auth = {
 		username: config.username || "",
 		password: config.password || "",
@@ -139,11 +164,11 @@ HttpAccessory.prototype = {
  * @param body The body of the request
  * @param callback Callback method to call with the result or error (error, response, body)
  */
-	httpRequest : function(url, body, callback) {
+	httpRequest : function(url, body, httpMethod, callback) {
 		request({
 			url: url,
 			body: body,
-			method: this.httpMethod,
+			method: httpMethod,
 			auth: {
 				user: this.auth.username,
 				pass: this.auth.password,
@@ -164,12 +189,12 @@ HttpAccessory.prototype = {
  * @param {string} string The string to apply the mappers to
  * @returns {string} The modified string after all mappers have been applied
  */
-	applyMappers : function(string) {
+	applyMappers : function(mappers, string) {
 		var self = this;
 
-		if (self.mappers.length > 0) {
+		if (mappers.length > 0) {
 			self.debugLog("Applying mappers on " + string);
-			self.mappers.forEach(function (mapper, index) {
+			mappers.forEach(function (mapper, index) {
 				var newString = mapper.map(string);
 				self.debugLog("Mapper " + index + " mapped " + string + " to " + newString);
 				string = newString;
@@ -195,20 +220,18 @@ HttpAccessory.prototype = {
 	getServices: function () {
 		var getDispatch = function (callback, characteristic) {
 			var actionName = "get" + characteristic.displayName.replace(/\s/g, '');
-			var self = this;
-			var url = self.urls[actionName];
-			this.log("getDispatch:actionName:url", actionName, url); 
+			var url = this.urls[actionName];
+			this.debugLog("getDispatch:actionName", actionName); 
 			if (!url) {
 				callback(null);
 			}
-
-			this.httpRequest(url, "", function(error, response, responseBody) {
+			this.httpRequest(url.url, url.body, url.httpMethod, function(error, response, responseBody) {
 				if (error) {
 					this.log("GetState function failed: %s", error.message);
 					callback(error);
 				} else {
 					var state = responseBody;
-					state = this.applyMappers(state);
+					state = this.applyMappers(url.mappers,state);
 					callback(null, parseInt(state));
 				}
 			}.bind(this));
@@ -219,16 +242,26 @@ HttpAccessory.prototype = {
 			if (this.enableSet == false) { callback() }
 			else {
 				var actionName = "set" + characteristic.displayName.replace(/\s/g, '')
-				this.log("setDispatch:actionName:value: ", actionName, value); 
-				request.get({ url: this.apiBaseUrl + "/" + actionName + this.apiSuffixUrl + "/" + value }, function (err, response, body) 
-				{
-					if (!err && response.statusCode == 200) 
-					{ 
-					this.log("setDispatch:returnedvalue: ", JSON.parse(body).value);
-					callback(null, JSON.parse(body).value);
+				this.debugLog("setDispatch:actionName:value: ", actionName, value); 
+				var action = this.urls[actionName];
+				if (!action) {
+					callback(null);
+				}
+				var url = action.url;
+				var body = action.body;
+				var httpMethod = action.httpMethod;
+				var mappedValue = this.applyMappers(action.mappers, value);
+				url = url.replace(/{value}/gi, mappedValue);
+				if (body) body = body.replace(/{value}/gi, mappedValue);
+				this.httpRequest(url, body, httpMethod, function(error, response, responseBody) {
+					if (error) {
+						this.log("GetState function failed: %s", error.message);
+						callback(error);
+					} else {
+						callback(null, value);
 					}
-					else { this.log("Error getting state: %s", actionName, err); callback(err); }
 				}.bind(this));
+
 			}
 		}.bind(this);
 
@@ -256,6 +289,7 @@ HttpAccessory.prototype = {
 			case "Doorbell": newService = new Service.Doorbell(this.name); break;
 			case "Fan": newService = new Service.Fan(this.name); break;
 			case "GarageDoorOpener": newService = new Service.GarageDoorOpener(this.name); break;
+			case "HeaterCooler": newService = new Service.HeaterCooler(this.name); break;
 			case "HumiditySensor": newService = new Service.HumiditySensor(this.name); break;
 			case "LeakSensor": newService = new Service.LeakSensor(this.name); break;
 			case "LightSensor": newService = new Service.LightSensor(this.name); break;
@@ -318,54 +352,33 @@ HttpAccessory.prototype = {
 			return {
 				getter: function (callback) {
 					var actionName = "get" + characteristic.displayName.replace(/\s/g, '')
-				//	console.log("1this.emitterActionNames[actionName]", this.emitterActionNames[actionName])
-					if (this.forceRefreshDelay == 0 /*|| typeof this.emitterActionNames[actionName] != "undefined"*/) { getDispatch(callback, characteristic); }
-					else 
-					{
+					if (this.forceRefreshDelay == 0 ) { 
+						getDispatch(callback, characteristic); 
+					} 
+					else {
 						var state = [];
-						var url = this.apiBaseUrl + "/" + actionName + this.apiSuffixUrl;
-					//	console.log("this.statusEmitters[actionName]", this.statusEmitters[actionName])
 						if (typeof this.statusEmitters[actionName] != "undefined") 
-						{
-							//this.statusEmitters[actionName].pause();
 							this.statusEmitters[actionName].interval.clear();
-						}
-						var self = this;
+
 						this.statusEmitters[actionName] = pollingtoevent(function (done) {
-							var url = self.urls[actionName];
-							if (!url) {
-								callback(null);
-							}
+							
+							getDispatch(done,characteristic);
 
-							this.httpRequest(url, "", function(error, response, responseBody) {
-								if (error) {
-									this.log("GetState function failed: %s", error.message);
-									done(error);
-								} else {
-									var state = responseBody;
-									state = this.applyMappers(state);
-									done(null, parseInt(state));
-								}
-							}.bind(this));
-
-						}.bind(this), { longpolling: true, interval: this.forceRefreshDelay*1000, longpollEventName: actionName });
+						}.bind(this), { 
+							longpolling: true, 
+							interval: this.forceRefreshDelay * 1000, 
+							longpollEventName: actionName 
+						});
 
 						this.statusEmitters[actionName].on(actionName, function (data) 
 						{
-						//	if (typeof this.emitterActionNames[actionName] == "undefined")
-						//	{
-
-						//	console.log("2statusemitter.on(actionName, function (data) ", this.emitterActionNames[actionName]);
-							this.enableSet = false;
+						    this.enableSet = false;
 							state[actionName] = data;
-						//	this.emitterActionNames[actionName] = data;
 							characteristic.setValue(data);
 							this.enableSet = true;
-						//	}
 						}.bind(this));
 
 						callback(null, state[actionName]);
-					//	callback(null, this.emitterActionNames[actionName]);
 					}
 				},
 				setter: function (value, callback) { setDispatch(value, callback, characteristic) }
