@@ -23,6 +23,36 @@ Configuration sample:
 	"description": "This is an example configuration for the Everything Homebridge plugin",
 	"accessories": [
 		{
+			 "accessory": "HttpAccessory",
+			 "service": "ContactSensor",
+			 "name": "Contact Terrace",
+			 "apiBaseUrl": "",
+			 "forceRefreshDelay": 5,
+			 "username": "admin",
+			 "password": "admin",
+			 "debug" : false,
+			 "urls":{
+			       "getContactSensorState": "http://localhost/xml/zones/zonesStatus48IP.xml"
+			    },
+			 "mappers": [
+				{
+				    "type": "xpath",
+				    "parameters": {
+					"xpath": "//status[8]/text()"
+				    }
+				},
+				{
+				    "type": "static",
+				    "parameters": {
+					"mapping": {
+					    "ALARM": "1",
+					    "NORMAL":"0"
+					}
+				    }
+				}
+			    ]
+	        },
+		{
 			"accessory": "HttpAccessory",
 			"service": "Thermostat",
 			"name": "Thermostat (Maison)",
