@@ -5,7 +5,7 @@ Supports all devices on HomeBridge Platform / Bridges devices to http
 # Installation
 
 1. Install homebridge using: npm install -g homebridge
-2. Install this plugin using: npm install -g homebridge-http-accessory
+2. Install this plugin using: npm install -g homebridge-http-advanced-accessory
 3. Update your configuration file. See sample-config.json in this repository for a sample. 
 
 # Configuration
@@ -23,7 +23,7 @@ Configuration sample:
 	"description": "This is an example configuration for the Everything Homebridge plugin",
 	"accessories": [
 		{
-			"accessory": "HttpAccessory",
+			"accessory": "HttpAdvancedAccessory",
 			"service": "ContactSensor",
 			"name": "Terrace Sensor",
 			"forceRefreshDelay": 5,
@@ -53,31 +53,45 @@ Configuration sample:
 			   }
 			} 
 		 },
-		{
-			"accessory": "HttpAccessory",
-			"service": "Thermostat",
-			"name": "Thermostat (Maison)",
-			"apiBaseUrl": "http://localhost:8080/thermostat",
-			"apiSuffixUrl": "",
-			"forceRefreshDelay": 0
-		},
-		{
-			"accessory": "HttpAccessory",
-			"service": "Thermostat",
-			"name": "Fan",
-			"apiBaseUrl": "http://localhost:8080/fan",
-			"apiSuffixUrl": "",
-			"forceRefreshDelay": 0,
-			"optionCharacteristic": ["RotationSpeed"]
-		},
-		{
-			"accessory": "HttpAccessory",
-			"service": "Switch",
-			"name": "Force Chauffe-eau",
-			"apiBaseUrl": "http://localhost:8080/switch",
-			"apiSuffixUrl": "",
-			"forceRefreshDelay": 0
-		}
+		 {
+         "accessory": "HttpAccessory",
+         "service": "SecuritySystem",
+         "name": "Btcino Security",
+         "forceRefreshDelay": 5,
+         "username": "admin",
+         "password": "admin",
+         "debug" : false,
+         "urls":{
+            "getSecuritySystemTargetState": {
+               "url" : "http://192.168.201.12/xml/state/virtualKeypad.xml", 
+               "mappers" : [
+                   { "type": "xpath",  "parameters": { "xpath": "//generic/text()" } },
+                   { "type": "static", "parameters": { "mapping": { "0": "3", "1": "1", "2": "2", "3": "0" } } }
+               ]
+            },
+            "getSecuritySystemCurrentState": {
+               "url" : "http://192.168.201.12/xml/partitions/partitionsStatus48IP.xml", 
+               "mappers" : [
+                  { "type": "regex",  "parameters": { "regexp" : "(ALARM)",    "capture": "1" } },
+                  { "type": "regex",  "parameters": { "regexp" : ">(ARMED)",   "capture": "1" } },
+                  { "type": "regex",  "parameters": { "regexp" : "(DISARMED)", "capture": "1" } },
+                  { "type": "static", "parameters": { "mapping": { "ALARM": "4", "ARMED":"inconclusive", "DISARMED": "3"} } }
+               ],
+               "inconclusive" : {
+                  "url" : "http://192.168.201.12/xml/state/virtualKeypad.xml", 
+                  "mappers" : [
+                      { "type": "xpath",  "parameters": { "xpath": "//generic/text()" } },
+                      { "type": "static", "parameters": { "mapping": { "0": "3", "1": "1", "2": "2", "3": "0" } } }
+                  ]
+               }
+            },
+            "setSecuritySystemTargetState": {
+               "url" : "http://192.168.201.12/xml/cmd/cmdOk.xml?cmd=setMacro&CPK=B40030Jd&macroId={value}&redirectPage=/xml/cmd/cmdError.xml", 
+               "mappers" : [
+                   { "type": "static", "parameters": { "mapping": { "0": "3", "1": "1", "2": "2", "3": "0" } } }
+               ]
+            }
+         } 
 		
 		
 	],
