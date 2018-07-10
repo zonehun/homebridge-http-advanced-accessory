@@ -81,6 +81,7 @@ function HttpAccessory(log, config) {
 	this.log(this.name, this.apiroute);
 	this.enableSet = true;
 	this.statusEmitters = [];
+	this.state = {};
 	// process the mappers
 	var self = this;
 	self.debug = config.debug;
@@ -89,7 +90,12 @@ function HttpAccessory(log, config) {
 	 *	getStatus : {
 	 *		url:"http://",
 	 *		httpMethod:"",
-	 *		mappers : []
+	 *		mappers : [],
+	 *      inconclusive : {
+	 * 			url:
+	 * 			httpMethods:"",
+	 * 			mappers[]
+	 * 		}
 	 *	},
 	 *	getTemp : {
 	 *		url:"http://",
@@ -104,30 +110,37 @@ function HttpAccessory(log, config) {
 	 * }
 	 *}
 	 */
+	function createAction(action, actionDescription){
+		action.url = actionDescription.url;
+		action.httpMethod = actionDescription.httpMethod || "GET";
+		action.body = actionDescription.body || "";
+		if (actionDescription.mappers) {
+			action.mappers = [];
+			actionDescription.mappers.forEach(function(matches) {
+				switch (matches.type) {
+					case "regex":
+						action.mappers.push(new RegexMapper(matches.parameters));
+						break;
+					case "static":
+						action.mappers.push(new StaticMapper(matches.parameters));
+						break;
+					case "xpath":
+						action.mappers.push(new XPathMapper(matches.parameters));
+						break;
+				}
+			});
+		}
+		if(actionDescription.inconclusive){
+			action.inconclusive = {};
+			createAction(action.inconclusive, actionDescription.inconclusive);
+		}
+	};
 	self.urls ={};
 	if(config.urls){
 		for (var actionName in config.urls){
 			if(!config.urls.hasOwnProperty(actionName)) continue;
 			self.urls[actionName] = {};
-			self.urls[actionName].url = config.urls[actionName].url;
-			self.urls[actionName].httpMethod = config.urls[actionName].httpMethod || "GET";
-			self.urls[actionName].body = config.urls[actionName].body || "";
-			if (config.urls[actionName].mappers) {
-				self.urls[actionName].mappers = [];
-				config.urls[actionName].mappers.forEach(function(matches) {
-					switch (matches.type) {
-						case "regex":
-							self.urls[actionName].mappers.push(new RegexMapper(matches.parameters));
-							break;
-						case "static":
-							self.urls[actionName].mappers.push(new StaticMapper(matches.parameters));
-							break;
-						case "xpath":
-							self.urls[actionName].mappers.push(new XPathMapper(matches.parameters));
-							break;
-					}
-				});
-			}
+			createAction(self.urls[actionName],config.urls[actionName]);
 		}
 
 	}
@@ -206,6 +219,30 @@ HttpAccessory.prototype = {
 		return string;
 	},
 
+	stringInject : function(str, data) {
+		if (typeof str === 'string' && (data instanceof Array)) {
+	
+			return str.replace(/({\d})/g, function(i) {
+				return data[i.replace(/{/, '').replace(/}/, '')];
+			});
+		} else if (typeof str === 'string' && (data instanceof Object)) {
+	
+			for (let key in data) {
+				return str.replace(/({([^}]+)})/g, function(i) {
+					let key = i.replace(/{/, '').replace(/}/, '');
+					if (!data[key]) {
+						return i;
+					}
+	
+					return data[key];
+				});
+			}
+		} else {
+	
+			return false;
+		}
+	},
+
 	//Start
 	identify: function (callback) {
 		this.log("Identify requested!");
@@ -218,21 +255,22 @@ HttpAccessory.prototype = {
 	},
 	
 	getServices: function () {
-		var getDispatch = function (callback, characteristic) {
-			var actionName = "get" + characteristic.displayName.replace(/\s/g, '');
-			var url = this.urls[actionName];
-			this.debugLog("getDispatch:actionName", actionName); 
-			if (!url) {
+		var getDispatch = function (callback, action) {
+			if (!action) {
 				callback(null);
 			}
-			this.httpRequest(url.url, url.body, url.httpMethod, function(error, response, responseBody) {
+			this.httpRequest(action.url, action.body, action.httpMethod, function(error, response, responseBody) {
 				if (error) {
 					this.log("GetState function failed: %s", error.message);
 					callback(error);
 				} else {
 					var state = responseBody;
-					state = this.applyMappers(url.mappers,state);
-					callback(null, parseInt(state));
+					state = this.applyMappers(action.mappers,state);
+					if(state == "inconclusive" && action.inconclusive){
+						getDispatch(callback,action.inconclusive);
+					}else{
+						callback(null, parseInt(state));
+					}
 				}
 			}.bind(this));
 
@@ -244,16 +282,19 @@ HttpAccessory.prototype = {
 				var actionName = "set" + characteristic.displayName.replace(/\s/g, '')
 				this.debugLog("setDispatch:actionName:value: ", actionName, value); 
 				var action = this.urls[actionName];
-				if (!action) {
+				if (!action || !action.url) {
 					callback(null);
 				}
-				var url = action.url;
 				var body = action.body;
-				var httpMethod = action.httpMethod;
 				var mappedValue = this.applyMappers(action.mappers, value);
-				url = url.replace(/{value}/gi, mappedValue);
-				if (body) body = body.replace(/{value}/gi, mappedValue);
-				this.httpRequest(url, body, httpMethod, function(error, response, responseBody) {
+				var url = action.url.replace(/{value}/gi, mappedValue);
+				url = this.stringInject(url, this.state);
+				if (body) {
+					body = body.replace(/{value}/gi, mappedValue);
+					body = this.stringInject (body,this.state);
+				}
+
+				this.httpRequest(url, body, action.httpMethod, function(error, response, responseBody) {
 					if (error) {
 						this.log("GetState function failed: %s", error.message);
 						callback(error);
@@ -351,18 +392,25 @@ HttpAccessory.prototype = {
 		function makeHelper(characteristic) {
 			return {
 				getter: function (callback) {
-					var actionName = "get" + characteristic.displayName.replace(/\s/g, '')
+					var actionName = "get" + characteristic.displayName.replace(/\s/g, '');
+					var action = this.urls[actionName];
 					if (this.forceRefreshDelay == 0 ) { 
-						getDispatch(callback, characteristic); 
+						getDispatch(function(error,data){
+							this.enableSet = false;
+							this.state[actionName] = data;
+							characteristic.setValue(data);
+							this.enableSet = true;
+							callback(error,data);
+						}.bind(this), action); 
 					} 
 					else {
-						var state = [];
+						
 						if (typeof this.statusEmitters[actionName] != "undefined") 
 							this.statusEmitters[actionName].interval.clear();
 
 						this.statusEmitters[actionName] = pollingtoevent(function (done) {
 							
-							getDispatch(done,characteristic);
+							getDispatch(done,action);
 
 						}.bind(this), { 
 							longpolling: true, 
@@ -373,12 +421,12 @@ HttpAccessory.prototype = {
 						this.statusEmitters[actionName].on(actionName, function (data) 
 						{
 						    this.enableSet = false;
-							state[actionName] = data;
+							this.state[actionName] = data;
 							characteristic.setValue(data);
 							this.enableSet = true;
 						}.bind(this));
-
-						callback(null, state[actionName]);
+						
+						callback(null, this.state[actionName]);
 					}
 				},
 				setter: function (value, callback) { setDispatch(value, callback, characteristic) }
