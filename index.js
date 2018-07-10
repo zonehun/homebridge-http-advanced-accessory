@@ -7,7 +7,7 @@ var pollingtoevent = require('polling-to-event');
 module.exports = function (homebridge) {
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
-	homebridge.registerAccessory("homebridge-http-accessory", "HttpAccessory", HttpAccessory);
+	homebridge.registerAccessory("homebridge-http-advanced-accessory", "HttpAdvancedAccessory", HttpAdvancedAccessory);
 };
 
 /**
@@ -72,7 +72,7 @@ function XPathMapper(parameters) {
 	};
 }
 
-function HttpAccessory(log, config) {
+function HttpAdvancedAccessory(log, config) {
 	this.log = log;
 	this.name = config.name;
 	this.service = config.service;
@@ -159,7 +159,7 @@ function HttpAccessory(log, config) {
 
 
 
-HttpAccessory.prototype = {
+HttpAdvancedAccessory.prototype = {
 	/**
  * Logs a message to the HomeBridge log
  *
@@ -425,7 +425,7 @@ HttpAccessory.prototype = {
 							characteristic.setValue(data);
 							this.enableSet = true;
 						}.bind(this));
-						
+
 						callback(null, this.state[actionName]);
 					}
 				},

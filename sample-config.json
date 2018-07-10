@@ -38,6 +38,50 @@
 			   }
 			} 
 		 },
+		 {
+			"accessory": "HttpAccessory",
+			"service": "HeaterCooler",
+			"name": "Condizionatore Soggiorno",
+			"forceRefreshDelay": 5,
+			"debug" : false,
+			"urls":{
+			   "getCurrentHeaterCoolerState": {
+				  "url" : "http://192.168.201.16/aircon/get_control_info", 
+				  "mappers" : [
+					 {"type": "regex", "parameters": {"regexp": "(pow=0)","capture": "1"} },
+					 {"type": "regex", "parameters": { "regexp": "mode=(\\d)", "capture": "1"} },
+					 {"type": "static", "parameters": { "mapping": { "pow=0": "0", "3":"3", "4":"2"} } }
+				  ]
+			   },
+			   "getTargetHeaterCoolerState":{
+				  "url" : "http://192.168.201.16/aircon/get_control_info", 
+				  "mappers" : [
+					 {"type": "regex", "parameters": {"regexp": "(pow=0)","capture": "1"} },
+					 {"type": "regex", "parameters": { "regexp": "mode=(\\d)", "capture": "1"} },
+					 {"type": "static", "parameters": { "mapping": { "pow=0": "0", "3":"3", "4":"2"} } }
+				  ]
+			   },
+			   "setTargetHeaterCoolerState":{
+				  "url" : "http://192.168.201.16/aircon/set_control_info/{value}",
+				   "mappers" : [
+					 {"type": "static", "parameters": { "mapping": { "0": "?mode=0", "1":"?mode=4", "2":"?mode=3"} } }
+				  ]
+			   },
+			   "getActive":{
+				  "url" : "http://192.168.201.16/aircon/get_control_info", 
+				  "mappers" : [
+					 {"type": "regex", "parameters": {"regexp": "pow=(\\d)","capture": "1"} }
+				  ]
+			   },
+			   "setActive":{
+				  "url" : "http://192.168.201.16/aircon/set_control_info/{value}",
+				   "mappers" : [
+					 {"type": "static", "parameters": { "mapping": { "0": "?pow=0", "1":"?pow=1"} } }
+				  ]
+			   }
+   
+			} 
+		 },
 		{
 			"accessory": "Httpeverything",
 			"service": "Thermostat",
