@@ -1,9 +1,9 @@
 # homebridge http advanced accessory
 
 Homebridge plugin that can turn virtually any device which exposes HTTP APIs into an HomeKit compatible Service.
-It's purpose is to connect any device that can be controlled via HTTP command to Homekit. It creates a Homebridge accessory which uses HTTP calls to *change* and *check* its state via the concept of 'actions'.
+Its purpose is to connect any device that can be controlled via HTTP command to Homekit. It creates a Homebridge accessory which uses HTTP calls to *change* and *check* its state via [Actions](#Actions).
 
-This plugin is a fork of HttpAccessory and has merged many features (mainly mappers) from the homebridge-http-securitysystem (<https://github.com/codetwice/homebridge-http-securitysystem>).
+This plugin is a fork of HttpAccessory and has merged many features (mainly mappers) from the [homebridge-http-securitysystem](<https://github.com/codetwice/homebridge-http-securitysystem>).
 
 ## Installation
 
@@ -117,10 +117,10 @@ Configuration sample:
 - The **service** parameter determines the kind of Service\Accessory you will see in HomeKit.
 - The **username/password** configuration can be used to specify the username and password if the remote webserver requires HTTP authentication.
 - A **debug** turns on debug messages. The important bit is that it reports the mapping process so that it's easier to debug.
-- The **optionCharacteristic** is an array of optional Characteristic of the service that you want to expose the full list of supported, mandatory and optional, Characteristics can be found here: <https://github.com/mlaanderson/HAP-NodeJS-Types/blob/master/lib/gen/README.md>
-- The **urls section** configures the URLs that are to be called on certain events. It contains a key-value map of actions that can be executed. The key is name of the action and the value is a configuration JSON object for that action. See the **Actions** section below.
+- The **optionCharacteristic** is an array of optional Characteristic of the service that you want to expose to HomeKit. The full list of supported, mandatory and optional, Characteristics can be found [HERE](<https://github.com/mlaanderson/HAP-NodeJS-Types/blob/master/lib/gen/README.md>)
+- The **urls section** configures the URLs that are to be called on certain events. It contains a key-value map of actions that can be executed. The key is name of the action and the value is a configuration JSON object for that action. See the [Actions](#Actions) section below.
 - The **polling** is a boolean that specifies if the current state should be pulled on regular intervals or not. Defaults to false.
-- **pollInterval** is a number which defines the poll interval in seconds. Defaults to 0.
+- **forceRefreshDelay** is a number which defines the poll interval in seconds. Defaults to 0.
 - The **mappings** optional parameter allows the definition of several response mappers. This can be used to translate the response received by readCurrentState and readTargetState to the expect 0...4 range expected by homekit
 
 ## Actions
@@ -129,7 +129,7 @@ The action is a key-value map that configures the URLs to be called to perform a
 So the key name is composed of two parts:
 
 - The kind of action: "get" or "set"
-- The name of the HomeKit Characteristics for that Service (the full list of supported Characteristics can be found here: <https://github.com/mlaanderson/HAP-NodeJS-Types/blob/master/lib/gen/README.md>
+- The name of the HomeKit Characteristics for that Service (the full list of supported Characteristics can be found [HERE](<https://github.com/mlaanderson/HAP-NodeJS-Types/blob/master/lib/gen/README.md>)
 
 For example to get the value of the SecuritySystemTargetState Characteristic, the key value would be "getSecuritySystemTargetState" while to set it, "setSecuritySystemTargetState"
 The value object has the following JSON format for a **getter** action:
@@ -150,11 +150,12 @@ The value object has the following JSON format for a **getter** action:
 ```
 
 Where:
--The **url** parameter is the url to be called for that action.
--The **httpMethod** (OPTIONAL) parameter is one of "GET" or "POST". Defaults to "GET".
--The **body** (OPTIONAL) parameter is the body of the HTTP POST call.
--The **mappers** (OPTIONAL) are a chain of blocks that have the purpose to parse the response received
--The **inconclusive** (OPTIONAL) parameter is another action that will be invoked if the result of the previous mapping chain is the word "inconclusive"
+
+- The **url** parameter is the url to be called for that action.
+- The **httpMethod** (OPTIONAL) parameter is one of "GET" or "POST". Defaults to "GET".
+- The **body** (OPTIONAL) parameter is the body of the HTTP POST call.
+- The **mappers** (OPTIONAL) are a chain of blocks that have the purpose to parse the response received
+- The **inconclusive** (OPTIONAL) parameter is another action that will be invoked if the result of the previous mapping chain is the word "inconclusive"
 
 The value object has the following JSON format for a **setter** action:
 
@@ -168,10 +169,11 @@ The value object has the following JSON format for a **setter** action:
 ```
 
 Where:
--The **url** parameter is the url to be called for that action. If the string contains the "{value}" placeholder, it will be replaced by the value that HomeKit wants to set, after being changed parsed by mappers.
--The **httpMethod** (OPTIONAL) parameter is one of "GET" or "POST". Defaults to "GET".
--The **body** (OPTIONAL) parameter is the body of the HTTP POST call.
--The **mappers** (OPTIONAL) are a chain of blocks that have the purpose of changing the value that HomeKit wants to set to something that is valid for your device
+
+- The **url** parameter is the url to be called for that action. If the string contains the "{value}" placeholder, it will be replaced by the value that HomeKit wants to set, after being changed parsed by mappers.
+- The **httpMethod** (OPTIONAL) parameter is one of "GET" or "POST". Defaults to "GET".
+- The **body** (OPTIONAL) parameter is the body of the HTTP POST call.
+- The **mappers** (OPTIONAL) are a chain of blocks that have the purpose of changing the value that HomeKit wants to set to something that is valid for your device
 
 ### Mapping
 
