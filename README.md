@@ -134,7 +134,7 @@ So the key name is composed of two parts:
 For example to get the value of the SecuritySystemTargetState Characteristic, the key value would be "getSecuritySystemTargetState" while to set it, "setSecuritySystemTargetState"
 The value object has the following JSON format for a **getter** action:
 
-```JSON
+```json
 "getTargetTemperature" : {
     "url":"http://",
     "httpMethod":"",
@@ -159,7 +159,7 @@ Where:
 
 The value object has the following JSON format for a **setter** action:
 
-```JSON
+```json
 "setTargetTemperature" : {
     "url":"http://remoteserver/setTemperature?stemp={value}",
     "httpMethod":"",
@@ -181,7 +181,7 @@ The mappings block of the configuration may contain any number of mapper definit
 
 Each mapper has the following JSON format:
 
-```JSON
+```json
 {
     "type": "<type of the mapper>",
     "parameters": { <parameters to be passed to the mapper> }
@@ -196,7 +196,7 @@ The static mapper can be used to define a key => value dictionary. It will simpl
 
 Configuration is as follows:
 
-```JSON
+```json
 {
     "type": "static",
     "parameters": { 
@@ -217,7 +217,7 @@ The regexp mapper can be used to define a regular expression to run on the input
 
 Configuration is as follows:
 
-```JSON
+```json
 {
     "type": "regex",
     "parameters": {
@@ -239,7 +239,7 @@ When using this mapper, make sure that you select text elements and not entire n
 
 Configuration is as follows:
 
-```JSON
+```json
 {
     "type": "xpath",
     "parameters": {
@@ -251,7 +251,7 @@ Configuration is as follows:
 
 Let's assume this mapper gets the following input:
 
-```XML
+```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <partitionsStatus>
     <partition>ARMED</partition>
@@ -357,7 +357,7 @@ This first example is to configure a Bticino (BT-4200, 4201, 4202) as a HomeKit 
 
 ### Bticino "Nuovo antifurto filare" Zones as ContactSensor
 
-```JSON
+```json
 {
     "accessory": "HttpAdvancedAccessory",
     "service": "ContactSensor",
@@ -395,7 +395,7 @@ This first example is to configure a Bticino (BT-4200, 4201, 4202) as a HomeKit 
 
 This is still incomplete but the unofficial Daikin documentation (<https://github.com/ael-code/daikin-control>) can help you to complete it.
 
-```JSON
+```json
 {
     "accessory": "HttpAccessory",
     "service": "HeaterCooler",
