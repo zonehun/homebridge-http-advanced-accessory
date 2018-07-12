@@ -161,7 +161,7 @@ The value object has the following JSON format for a **setter** action:
 
 ```JSON
 "setTargetTemperature" : {
-    "url":"http://remoteserver/setTemperature?{value}",
+    "url":"http://remoteserver/setTemperature?stemp={value}",
     "httpMethod":"",
     "body" : "{value}",
     "mappers" : []
