@@ -8,7 +8,7 @@
 	"description": "This is an example configuration for the Everything Homebridge plugin",
 	"accessories": [
 		{
-			"accessory": "HttpAccessory",
+			"accessory": "HttpAdvancedAccessory",
 			"service": "ContactSensor",
 			"name": "Terrace Sensor",
 			"forceRefreshDelay": 5,
@@ -39,7 +39,7 @@
 			} 
 		 },
 		 {
-			"accessory": "HttpAccessory",
+			"accessory": "HttpAdvancedAccessory",
 			"service": "HeaterCooler",
 			"name": "Condizionatore Soggiorno",
 			"forceRefreshDelay": 5,
@@ -62,7 +62,7 @@
 				  ]
 			   },
 			   "setTargetHeaterCoolerState":{
-				  "url" : "http://192.168.201.16/aircon/set_control_info/{value}",
+				  "url" : "http://192.168.201.16/aircon/set_control_info/{value}&pow=${state.getActive}&",
 				   "mappers" : [
 					 {"type": "static", "parameters": { "mapping": { "0": "?mode=0", "1":"?mode=4", "2":"?mode=3"} } }
 				  ]
@@ -81,74 +81,7 @@
 			   }
    
 			} 
-		 },
-		{
-			"accessory": "Httpeverything",
-			"service": "Thermostat",
-			"name": "Thermostat (Maison)",
-			"apiBaseUrl": "http://localhost:8080/thermostat",
-			"apiSuffixUrl": "",
-			"forceRefreshDelay": 0
-		},
-		{
-			"accessory": "Httpeverything",
-			"service": "WindowCovering",
-			"name": "Volet (Salon)",
-			"apiBaseUrl": "http://localhost:8080/window-covering",
-			"apiSuffixUrl": "/0",
-			"forceRefreshDelay": 0
-		},
-		{
-			"accessory": "Httpeverything",
-			"service": "WindowCovering",
-			"name": "Volet (Salle à manger)",
-			"apiBaseUrl": "http://localhost:8080/window-covering",
-			"apiSuffixUrl": "/1",
-			"forceRefreshDelay": 0
-		},
-		{
-			"accessory": "Httpeverything",
-			"service": "WindowCovering",
-			"name": "Volet (Bureau)",
-			"apiBaseUrl": "http://localhost:8080/window-covering",
-			"apiSuffixUrl": "/2",
-			"forceRefreshDelay": 0
-		},
-		{
-			"accessory": "Httpeverything",
-			"service": "WindowCovering",
-			"name": "Volet (Cuisine)",
-			"apiBaseUrl": "http://localhost:8080/window-covering",
-			"apiSuffixUrl": "/3",
-			"forceRefreshDelay": 0
-		},
-				{
-			"accessory": "Httpeverything",
-			"service": "WindowCovering",
-			"name": "Volets (Maison)",
-			"apiBaseUrl": "http://localhost:8080/window-covering",
-			"apiSuffixUrl": "/all",
-			"forceRefreshDelay": 0
-		},
-		{
-			"accessory": "Httpeverything",
-			"service": "HumiditySensor",
-			"name": "Humidité",
-			"apiBaseUrl": "http://localhost:8080/humidity-sensor",
-			"apiSuffixUrl": "",
-			"forceRefreshDelay": 0
-		},
-		{
-			"accessory": "Httpeverything",
-			"service": "TemperatureSensor",
-			"name": "Temp. Ext.",
-			"apiBaseUrl": "http://localhost:8080/temperature-sensor",
-			"apiSuffixUrl": "",
-			"forceRefreshDelay": 0,
-			"optionCharacteristic":[]
-		}
-		
-		
+		 }
 	],
 	"platforms": []
 }
