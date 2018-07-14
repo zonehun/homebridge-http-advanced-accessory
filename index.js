@@ -436,7 +436,7 @@ HttpAdvancedAccessory.prototype = {
 								callback(null, this.state[actionName]);
 							}
 							// just call it once, multiple calls not allowed
-							delete callback;
+							callback = null;
 						}.bind(this));
 
 						
