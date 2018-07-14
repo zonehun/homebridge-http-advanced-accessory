@@ -205,7 +205,7 @@ HttpAdvancedAccessory.prototype = {
 	applyMappers : function(mappers, string) {
 		var self = this;
 
-		if (mappers.length > 0) {
+		if (mappers && mappers.length > 0) {
 			self.debugLog("Applying mappers on " + string);
 			mappers.forEach(function (mapper, index) {
 				var newString = mapper.map(string);
