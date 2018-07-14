@@ -174,10 +174,24 @@ The value object has the following JSON format for a **setter** action:
 
 Where:
 
-- The **url** parameter is the url to be called for that action. If the string contains the "{value}" placeholder, it will be replaced by the value that HomeKit wants to set, after being changed parsed by mappers.
+- The **url** parameter is the url to be called for that action. If the string contains the "{value}" placeholder, it will be replaced by the value that HomeKit wants to set, after being changed parsed by mappers. The url can also be a string template, see [URL Template](#url-template)
 - The **httpMethod** (OPTIONAL) parameter is one of "GET" or "POST". Defaults to "GET".
 - The **body** (OPTIONAL) parameter is the body of the HTTP POST call.
 - The **mappers** (OPTIONAL) are a chain of blocks that have the purpose of changing the value that HomeKit wants to set to something that is valid for your device,  see [Mapping](#mapping)
+
+### URL Template
+
+The URL can be a [string template](<http://exploringjs.com/es6/ch_template-literals.html>) so you can use esxpressions like *$(state.getCurrentTemperaure)* that will be replaced by the current value of the Charateristic CurrentTemperature.
+The *state* variable contains all the values of the Charateristics of the Service, plus the *value* variable contains the value HK wants to set for the Charateristic being setted.
+For example suppose that when setting the Active state of a HeatingCooling system it also needs to set the TargetTemperature in fahrenheit you may have something like this:
+
+```json
+"setActive" : {
+    "url":"http://remoteserver/setActive?${value}&stemp=${state.getTargetTemperature * 9/5 +32}"
+}
+```
+
+
 
 ### Mapping
 
@@ -459,16 +473,13 @@ This is still incomplete but the unofficial Daikin documentation (<https://githu
     "debug" : false,
     "urls":{
         "getOn":{
-            "url" : "http://192.168.x.x/aircon/get_control_info", 
+            "url" : "http://192.168.x.x/YamahaExtendedControl/v1/main/getStatus",
             "mappers" : [
-                {"type": "regex", "parameters": {"regexp": "pow=(\\d)","capture": "1"} }
+                {"type": "regex", "parameters": {"regexp": "power\":\"(standby|on)\"","capture": "1"}},{"type": "static", "parameters": { "mapping": { "on": "1", "standby":"0"} } }
             ]
         },
         "setOn":{
-            "url" : "http://192.168.x.x/aircon/set_control_info/{value}",
-            "mappers" : [
-                {"type": "static", "parameters": { "mapping": { "0": "?pow=0", "1":"?pow=1"} } }
-            ]
+            "url" : "http://192.168.x.x/YamahaExtendedControl/v1/main/setPower?power=${value==1?|\"on\":\"standby\"}"
         }
 
     }
