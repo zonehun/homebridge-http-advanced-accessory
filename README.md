@@ -1,7 +1,7 @@
 # homebridge http advanced accessory
 
 Homebridge plugin that can turn virtually any device which exposes HTTP APIs into an HomeKit compatible Service.
-Its purpose is to connect any device that can be controlled via HTTP command to Homekit. It creates a Homebridge accessory which uses HTTP calls to *change* and *check* its state via [Actions](#Actions).
+Its purpose is to connect any device that can be controlled via HTTP command to Homekit. It creates a Homebridge accessory which uses HTTP calls to *change* and *check* its state via [Actions](#actions).
 
 This plugin is a fork of HttpAccessory and has merged many features (mainly mappers) from the [homebridge-http-securitysystem](<https://github.com/codetwice/homebridge-http-securitysystem>).
 
@@ -68,7 +68,7 @@ Configuration sample:
             }
          },
          {
-         "accessory": "HttpAccessory",
+         "accessory": "HttpAdvancedAccessory",
          "service": "SecuritySystem",
          "name": "Btcino Security",
          "forceRefreshDelay": 5,
@@ -118,10 +118,9 @@ Configuration sample:
 - The **username/password** configuration can be used to specify the username and password if the remote webserver requires HTTP authentication.
 - A **debug** turns on debug messages. The important bit is that it reports the mapping process so that it's easier to debug.
 - The **optionCharacteristic** is an array of optional Characteristic of the service that you want to expose to HomeKit. The full list of supported, mandatory and optional, Characteristics can be found [HERE](<https://github.com/mlaanderson/HAP-NodeJS-Types/blob/master/lib/gen/README.md>)
-- The **urls section** configures the URLs that are to be called on certain events. It contains a key-value map of actions that can be executed. The key is name of the action and the value is a configuration JSON object for that action. See the [Actions](#Actions) section below.
+- The **urls section** configures the URLs that are to be called on certain events. It contains a key-value map of actions that can be executed. The key is name of the action and the value is a configuration JSON object for that action. See the [Actions](#actions) section below.
 - The **polling** is a boolean that specifies if the current state should be pulled on regular intervals or not. Defaults to false.
 - **forceRefreshDelay** is a number which defines the poll interval in seconds. Defaults to 0.
-- The **mappings** optional parameter allows the definition of several response mappers. This can be used to translate the response received by readCurrentState and readTargetState to the expect 0...4 range expected by homekit
 
 ## Actions
 
@@ -132,6 +131,9 @@ So the key name is composed of two parts:
 - The name of the HomeKit Characteristics for that Service (the full list of supported Characteristics can be found [HERE](<https://github.com/mlaanderson/HAP-NodeJS-Types/blob/master/lib/gen/README.md>)
 
 For example to get the value of the SecuritySystemTargetState Characteristic, the key value would be "getSecuritySystemTargetState" while to set it, "setSecuritySystemTargetState"
+
+### Getter Action
+
 The value object has the following JSON format for a **getter** action:
 
 ```json
@@ -154,8 +156,10 @@ Where:
 - The **url** parameter is the url to be called for that action.
 - The **httpMethod** (OPTIONAL) parameter is one of "GET" or "POST". Defaults to "GET".
 - The **body** (OPTIONAL) parameter is the body of the HTTP POST call.
-- The **mappers** (OPTIONAL) are a chain of blocks that have the purpose to parse the response received
+- The **mappers** (OPTIONAL) are a chain of blocks that have the purpose to parse the response received, see [Mapping](#mapping)
 - The **inconclusive** (OPTIONAL) parameter is another action that will be invoked if the result of the previous mapping chain is the word "inconclusive"
+
+### Setter Action
 
 The value object has the following JSON format for a **setter** action:
 
@@ -173,7 +177,7 @@ Where:
 - The **url** parameter is the url to be called for that action. If the string contains the "{value}" placeholder, it will be replaced by the value that HomeKit wants to set, after being changed parsed by mappers.
 - The **httpMethod** (OPTIONAL) parameter is one of "GET" or "POST". Defaults to "GET".
 - The **body** (OPTIONAL) parameter is the body of the HTTP POST call.
-- The **mappers** (OPTIONAL) are a chain of blocks that have the purpose of changing the value that HomeKit wants to set to something that is valid for your device
+- The **mappers** (OPTIONAL) are a chain of blocks that have the purpose of changing the value that HomeKit wants to set to something that is valid for your device,  see [Mapping](#mapping)
 
 ### Mapping
 
@@ -314,7 +318,7 @@ This first example is to configure a Bticino (BT-4200, 4201, 4202) as a HomeKit 
 
 ```json
     {
-        "accessory": "HttpAccessory",
+        "accessory": "HttpAdvancedAccessory",
         "service": "SecuritySystem",
         "name": "Btcino Security",
         "forceRefreshDelay": 5,
@@ -397,14 +401,14 @@ This is still incomplete but the unofficial Daikin documentation (<https://githu
 
 ```json
 {
-    "accessory": "HttpAccessory",
+    "accessory": "HttpAdvancedAccessory",
     "service": "HeaterCooler",
     "name": "Condizionatore Soggiorno",
     "forceRefreshDelay": 5,
     "debug" : false,
     "urls":{
         "getCurrentHeaterCoolerState": {
-            "url" : "http://192.168.x.x/aircon/get_control_info", 
+            "url" : "http://192.168.x.x/aircon/get_control_info",
             "mappers" : [
                 {"type": "regex", "parameters": {"regexp": "(pow=0)","capture": "1"} },
                 {"type": "regex", "parameters": { "regexp": "mode=(\\d)", "capture": "1"} },
@@ -416,7 +420,7 @@ This is still incomplete but the unofficial Daikin documentation (<https://githu
             "mappers" : [
                 {"type": "regex", "parameters": {"regexp": "(pow=0)","capture": "1"} },
                 {"type": "regex", "parameters": { "regexp": "mode=(\\d)", "capture": "1"} },
-                {"type": "static", "parameters": { "mapping": { "pow=0": "0", "3":"3", "4":"2"} } }
+                {"type": "static", "parameters": { "mapping": { "pow=0": "0", "3":"3", "4":"2", "0":"3", "1":"3", "7":"3", "2":"3"} } }
             ]
         },
         "setTargetHeaterCoolerState":{
@@ -432,6 +436,35 @@ This is still incomplete but the unofficial Daikin documentation (<https://githu
             ]
         },
         "setActive":{
+            "url" : "http://192.168.x.x/aircon/set_control_info/{value}",
+            "mappers" : [
+                {"type": "static", "parameters": { "mapping": { "0": "?pow=0", "1":"?pow=1"} } }
+            ]
+        }
+
+    }
+}
+
+```
+
+### Yanaha Musiccast WX-010 as Switch
+
+
+```json
+{
+    "accessory": "HttpAdvancedAccessory",
+    "service": "Switch",
+    "name": "Bedroom speaker",
+    "forceRefreshDelay": 5,
+    "debug" : false,
+    "urls":{
+        "getOn":{
+            "url" : "http://192.168.x.x/aircon/get_control_info", 
+            "mappers" : [
+                {"type": "regex", "parameters": {"regexp": "pow=(\\d)","capture": "1"} }
+            ]
+        },
+        "setOn":{
             "url" : "http://192.168.x.x/aircon/set_control_info/{value}",
             "mappers" : [
                 {"type": "static", "parameters": { "mapping": { "0": "?pow=0", "1":"?pow=1"} } }
