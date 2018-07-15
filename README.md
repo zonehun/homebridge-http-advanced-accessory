@@ -461,8 +461,7 @@ This is still incomplete but the unofficial Daikin documentation (<https://githu
 
 ```
 
-### Yanaha Musiccast WX-010 as Switch
-
+### Yamaha Musiccast WX-010 as Switch
 
 ```json
 {
@@ -479,7 +478,7 @@ This is still incomplete but the unofficial Daikin documentation (<https://githu
             ]
         },
         "setOn":{
-            "url" : "http://192.168.201.11/YamahaExtendedControl/v1/main/setPower?power=${value==1?\"on\":\"standby\"}"
+            "url" : "http://192.168.x.x/YamahaExtendedControl/v1/main/setPower?power=${value==1?\"on\":\"standby\"}"
         }
 
     }
