@@ -348,7 +348,7 @@ This first example is to configure a Bticino (BT-4200, 4201, 4202) as a HomeKit 
                 ]
             },
             "getSecuritySystemCurrentState": {
-                "url" : "http://remoteserver/xml/partitions/partitionsStatus48IP.xml", 
+                "url" : "http://remoteserver/xml/partitions/partitionsStatus48IP.xml",
                 "mappers" : [
                     { "type": "regex",  "parameters": { "regexp" : "(ALARM)",    "capture": "1" } },
                     { "type": "regex",  "parameters": { "regexp" : ">(ARMED)",   "capture": "1" } },
@@ -411,7 +411,7 @@ This first example is to configure a Bticino (BT-4200, 4201, 4202) as a HomeKit 
 
 ### Daikin as HeaterCooler
 
-This is still incomplete but the unofficial Daikin documentation (<https://github.com/ael-code/daikin-control>) can help you to complete it.
+This is still incomplete but the unofficial [Daikin documentation](https://github.com/ael-code/daikin-control) can help you to complete it.
 
 ```json
 {
