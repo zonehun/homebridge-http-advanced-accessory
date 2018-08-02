@@ -412,8 +412,10 @@ HttpAdvancedAccessory.prototype = {
 					} 
 					else {
 						
-						if (typeof this.statusEmitters[actionName] != "undefined") 
-							this.statusEmitters[actionName].interval.clear();
+						if (typeof this.statusEmitters[actionName] != "undefined"){
+							callback(error,this.state[actionName]);
+							return;
+						} 
 
 						this.statusEmitters[actionName] = pollingtoevent(function (done) {
 							
