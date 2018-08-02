@@ -3,7 +3,7 @@
 Homebridge plugin that can turn virtually any device which exposes HTTP APIs into an HomeKit compatible Service.
 Its purpose is to connect any device that can be controlled via HTTP command to Homekit. It creates a Homebridge accessory which uses HTTP calls to *change* and *check* its state via [Actions](#actions).
 
-This plugin is a fork of HttpAccessory and has merged many features (mainly mappers) from the [homebridge-http-securitysystem](<https://github.com/codetwice/homebridge-http-securitysystem>).
+This plugin is a fork of HttpAccessory and has merged many features (mainly mappers) from the [homebridge-http-securitysystem](<https://www.npmjs.com/package/homebridge-http-securitysystem>).
 
 ## Installation
 
@@ -117,7 +117,7 @@ Configuration sample:
 - The **service** parameter determines the kind of Service\Accessory you will see in HomeKit.
 - The **username/password** configuration can be used to specify the username and password if the remote webserver requires HTTP authentication.
 - A **debug** turns on debug messages. The important bit is that it reports the mapping process so that it's easier to debug.
-- The **optionCharacteristic** is an array of optional Characteristic of the service that you want to expose to HomeKit. The full list of supported, mandatory and optional, Characteristics can be found [HERE](<https://github.com/mlaanderson/HAP-NodeJS-Types/blob/master/lib/gen/README.md>)
+- The **optionCharacteristic** is an array of optional Characteristic of the service that you want to expose to HomeKit. The full list of mandatory and optional Characteristics types that HomeKit supports are exposed as a separate subclass in [HomeKitTypes](https://github.com/KhaosT/HAP-NodeJS/blob/HEAD/lib/gen/HomeKitTypes.js).
 - The **urls section** configures the URLs that are to be called on certain events. It contains a key-value map of actions that can be executed. The key is name of the action and the value is a configuration JSON object for that action. See the [Actions](#actions) section below.
 - The **polling** is a boolean that specifies if the current state should be pulled on regular intervals or not. Defaults to false.
 - **forceRefreshDelay** is a number which defines the poll interval in seconds. Defaults to 0.
@@ -128,7 +128,7 @@ The action is a key-value map that configures the URLs to be called to perform a
 So the key name is composed of two parts:
 
 - The kind of action: "get" or "set"
-- The name of the HomeKit Characteristics for that Service (the full list of supported Characteristics can be found [HERE](<https://github.com/mlaanderson/HAP-NodeJS-Types/blob/master/lib/gen/README.md>)
+- The name of the HomeKit Characteristics for that Service. All known built-in Service and Characteristic types that HomeKit supports are exposed as a separate subclass in [HomeKitTypes](https://github.com/KhaosT/HAP-NodeJS/blob/HEAD/lib/gen/HomeKitTypes.js).
 
 For example to get the value of the SecuritySystemTargetState Characteristic, the key value would be "getSecuritySystemTargetState" while to set it, "setSecuritySystemTargetState"
 
