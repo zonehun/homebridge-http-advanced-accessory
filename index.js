@@ -413,7 +413,7 @@ HttpAdvancedAccessory.prototype = {
 					else {
 						
 						if (typeof this.statusEmitters[actionName] != "undefined"){
-							callback(error,this.state[actionName]);
+							callback(null,this.state[actionName]);
 							return;
 						} 
 
