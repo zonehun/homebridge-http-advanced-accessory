@@ -259,16 +259,20 @@ HttpAdvancedAccessory.prototype = {
 			if (!action) {
 				callback(null);
 			}
+			this.debugLog("getDispatch function called for url: %s", action.url);
 			this.httpRequest(action.url, action.body, action.httpMethod, function(error, response, responseBody) {
 				if (error) {
 					this.log("GetState function failed: %s", error.message);
 					callback(error);
 				} else {
+					this.debugLog("received response from action: %s", action.url);
 					var state = responseBody;
 					state = this.applyMappers(action.mappers,state);
 					if(state == "inconclusive" && action.inconclusive){
+						this.debugLog("response inconclusive, try again.");
 						getDispatch(callback,action.inconclusive);
 					}else{
+						this.debugLog("We have a value: %s, int: %d", state, parseInt(state));
 						callback(null, parseInt(state));
 					}
 				}
@@ -403,6 +407,7 @@ HttpAdvancedAccessory.prototype = {
 					var action = this.urls[actionName];
 					if (this.forceRefreshDelay == 0 ) { 
 						getDispatch(function(error,data){
+							this.debugLog(actionName + " getter function returned with data: " + data);
 							this.enableSet = false;
 							this.state[actionName] = data;
 							characteristic.setValue(data);
@@ -413,12 +418,14 @@ HttpAdvancedAccessory.prototype = {
 					else {
 						
 						if (typeof this.statusEmitters[actionName] != "undefined"){
+							this.debugLog(actionName + " returning cached data: " + this.state[actionName]);
 							callback(null,this.state[actionName]);
 							return;
 						} 
+						this.debugLog("creating new emitter for " + actionName);
 
 						this.statusEmitters[actionName] = pollingtoevent(function (done) {
-							
+							this.debugLog("requested update for action " + actionName);
 							getDispatch(done,action);
 
 						}.bind(this), { 
@@ -429,18 +436,23 @@ HttpAdvancedAccessory.prototype = {
 
 						this.statusEmitters[actionName].on(actionName, function (data) 
 						{
-						    this.enableSet = false;
+							this.debugLog(actionName + " emitter returned data: " + data);
+							this.enableSet = false;
 							this.state[actionName] = data;
 							characteristic.setValue(data);
 							this.enableSet = true;
 						
 							if(callback){
+								this.debugLog("calling callback for action " + actionName);
 								callback(null, this.state[actionName]);
 							}
 							// just call it once, multiple calls not allowed
 							callback = null;
 						}.bind(this));
 
+						this.statusEmitters[actionName].on("error", function(err, data) {
+							this.log("Emitter errored: %s. with data %j", err, data);
+						}.bind(this));
 						
 					}
 				},
