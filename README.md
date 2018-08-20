@@ -280,6 +280,40 @@ Let's assume this mapper gets the following input:
 
 In this case this mapper will return "ARMED_IMMEDIATE". The ***index*** parameter can be used to specify which element to return if the xpath selects multiple elements. In the example above it is completely redundant as partition[3] already makes sure that a single partition is selected.
 
+#### JSONPath mapper
+
+The JSONPath mapper can be used to extract data from an JSON object. See https://www.npmjs.com/package/JSONPath#syntax-through-examples for syntax and more examples.
+
+When using this mapper, make sure that you select text elements and not entire objects, otherwise it will fail horribly.
+
+Configuration is as follows:
+
+```json
+{
+    "type": "jpath",
+    "parameters": {
+        "jpath": "$..partition[2]",
+        "index": 0
+    }
+}
+```
+
+Let's assume this mapper gets the following input:
+
+```json
+{
+    "partitionsStatus": {
+        "partition": [
+            "ARMED",
+            "ARMED",
+            "ARMED_IMMEDIATE",
+        ]
+    }
+}
+```
+
+In this case this mapper will return "ARMED_IMMEDIATE". The ***index*** parameter can be used to specify which element to return if the JSONPath selects multiple elements. In the example above it is completely redundant as partition[2] already makes sure that a single partition is selected.
+
 ## Supported services
 
 AccessoryInformation

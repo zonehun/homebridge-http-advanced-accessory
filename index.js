@@ -2,6 +2,7 @@ var Service, Characteristic;
 var request = require("request");
 var xpath = require("xpath");
 var dom = require("xmldom").DOMParser;
+var JSONPath = require("JSONPath");
 var pollingtoevent = require('polling-to-event');
 
 module.exports = function (homebridge) {
@@ -72,13 +73,39 @@ function XPathMapper(parameters) {
 	};
 }
 
+/**
+ * Mapper class that uses JSONPath to select the text of a node or the value of an attribute
+ *
+ * @param {Object} parameters The parameters of the mapper
+ * @constructor
+ */
+function JPathMapper(parameters) {
+	var self = this;
+	self.jpath = parameters.jpath;
+	self.index = parameters.index || 0;
+
+	self.map = function(value) {
+		var json = JSON.parse(value);
+		var result  = JSONPath({path: self.jpath, json: json});
+
+		if (result instanceof Array && result.length > self.index) {
+			result = result[self.index];
+		}
+		
+		if (result instanceof Object) {
+			return JSON.stringify(result);
+		}
+
+		return result;
+	};
+}
+
 function HttpAdvancedAccessory(log, config) {
 	this.log = log;
 	this.name = config.name;
 	this.service = config.service;
 	this.optionCharacteristic = config.optionCharacteristic || [];
 	this.forceRefreshDelay = config.forceRefreshDelay || 0;
-	this.log(this.name, this.apiroute);
 	this.enableSet = true;
 	this.statusEmitters = [];
 	this.state = {};
@@ -126,6 +153,9 @@ function HttpAdvancedAccessory(log, config) {
 						break;
 					case "xpath":
 						action.mappers.push(new XPathMapper(matches.parameters));
+						break;
+					case "jpath":
+						action.mappers.push(new JPathMapper(matches.parameters));
 						break;
 				}
 			});
