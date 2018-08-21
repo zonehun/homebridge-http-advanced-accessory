@@ -282,9 +282,9 @@ In this case this mapper will return "ARMED_IMMEDIATE". The ***index*** paramete
 
 #### JSONPath mapper
 
-The JSONPath mapper can be used to extract data from an JSON object. See https://www.npmjs.com/package/JSONPath#syntax-through-examples for syntax and more examples.
+The JSONPath mapper can be used to extract data from a JSON object. See https://www.npmjs.com/package/JSONPath#syntax-through-examples for syntax and more examples.
 
-When using this mapper, make sure that you select text elements and not entire objects, otherwise it will fail horribly.
+When using this mapper, make sure that you select text elements or arrays and not entire objects.
 
 Configuration is as follows:
 
@@ -292,7 +292,7 @@ Configuration is as follows:
 {
     "type": "jpath",
     "parameters": {
-        "jpath": "$..partition[2]",
+        "jpath": "$.partitionsStatus.partition[2]",
         "index": 0
     }
 }
@@ -495,7 +495,7 @@ This is still incomplete but the unofficial Daikin documentation (<https://githu
 
 ```
 
-### Yanaha Musiccast WX-010 as Switch
+### Yamaha Musiccast WX-010 as Switch
 
 
 ```json
@@ -509,7 +509,22 @@ This is still incomplete but the unofficial Daikin documentation (<https://githu
         "getOn":{
             "url" : "http://192.168.x.x/YamahaExtendedControl/v1/main/getStatus",
             "mappers" : [
-                {"type": "regex", "parameters": {"regexp": "power\":\"(standby|on)\"","capture": "1"}},{"type": "static", "parameters": { "mapping": { "on": "1", "standby":"0"} } }
+                {
+                    "type": "jpath",
+                    "parameters": {
+                        "jpath": "$..power",
+                        "index": "0"
+                    }
+                },
+                {
+                    "type": "static",
+                    "parameters": {
+                        "mapping": {
+                            "on": "1",
+                            "standby": "0"
+                        }
+                    }
+                }
             ]
         },
         "setOn":{
