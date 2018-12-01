@@ -47,6 +47,7 @@ Configuration sample:
             "urls":{
                "getContactSensorState": {
                   "url" : "http://remoteserver/xml/zones/zonesStatus48IP.xml",
+                  "floatValue" : false,
                   "mappers" : [
                       {
                           "type": "xpath",
@@ -144,6 +145,7 @@ The value object has the following JSON format for a **getter** action:
     "mappers" : [],
     "inconclusive" : {
         "url":"",
+        "floatValue" : ,
         "httpMethods":"",
         "mappers": [],
         "inconclusive":{}
@@ -154,6 +156,7 @@ The value object has the following JSON format for a **getter** action:
 Where:
 
 - The **url** parameter is the url to be called for that action.
+- The **floatValue** (OPTIONAL) parameter is for the value parsing mechanism. For eg. TemperatureSensor value is nicer with float values.
 - The **httpMethod** (OPTIONAL) parameter is one of "GET" or "POST". Defaults to "GET".
 - The **body** (OPTIONAL) parameter is the body of the HTTP POST call.
 - The **mappers** (OPTIONAL) are a chain of blocks that have the purpose to parse the response received, see [Mapping](#mapping)
@@ -493,6 +496,33 @@ This is still incomplete but the unofficial [Daikin documentation](https://githu
     }
 }
 
+```
+
+### Froggit Weather Station temperature data
+
+```json
+{
+			"accessory": "HttpAdvancedAccessory",
+			"service": "TemperatureSensor",
+			"name": "Outdoor temp",
+			"forceRefreshDelay": 120,
+			"debug" : false,
+			"urls":{
+				"getCurrentTemperature" : {
+					"url" : "http://192.168.x.x/weatherstation/weather_IVC267.json",
+					"floatValue" : true,
+					"mappers" : [
+						{
+							"type": "jpath",
+							"parameters": {
+								"jpath": "$.tempc",
+								"index": 0
+							}
+						}
+					]
+				}
+			}
+		}
 ```
 
 ### Yamaha Musiccast WX-010 as Switch
