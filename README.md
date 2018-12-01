@@ -498,31 +498,31 @@ This is still incomplete but the unofficial [Daikin documentation](https://githu
 
 ```
 
-### Froggit Weather Station temperature data
+### Froggit WH3000 SE (Second Edition - 2018) Weather Station as TemperatureSensor
 
 ```json
 {
-			"accessory": "HttpAdvancedAccessory",
-			"service": "TemperatureSensor",
-			"name": "Outdoor temp",
-			"forceRefreshDelay": 120,
-			"debug" : false,
-			"urls":{
-				"getCurrentTemperature" : {
-					"url" : "http://192.168.x.x/weatherstation/weather_IVC267.json",
-					"floatValue" : true,
-					"mappers" : [
-						{
-							"type": "jpath",
-							"parameters": {
-								"jpath": "$.tempc",
-								"index": 0
-							}
-						}
-					]
+	"accessory": "HttpAdvancedAccessory",
+	"service": "TemperatureSensor",
+	"name": "Outdoor temp",
+	"forceRefreshDelay": 120,
+	"debug" : false,
+	"urls":{
+		"getCurrentTemperature" : {
+		"url" : "http://192.168.x.x/weatherstation/weather_IVC267.json",
+		"floatValue" : true,
+		"mappers" : [
+			{
+				"type": "jpath",
+				"parameters": {
+					"jpath": "$.tempc",
+					"index": 0
 				}
 			}
+		]
 		}
+	}
+}
 ```
 
 ### Yamaha Musiccast WX-010 as Switch
