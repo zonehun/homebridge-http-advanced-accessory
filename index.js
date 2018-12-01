@@ -141,6 +141,10 @@ function HttpAdvancedAccessory(log, config) {
 		action.url = actionDescription.url;
 		action.httpMethod = actionDescription.httpMethod || "GET";
 		action.body = actionDescription.body || "";
+		
+		/* Edited by Tamas Gal 2018.10.22. */
+		action.floatValue = actionDescription.floatValue;
+		
 		if (actionDescription.mappers) {
 			action.mappers = [];
 			actionDescription.mappers.forEach(function(matches) {
@@ -302,8 +306,16 @@ HttpAdvancedAccessory.prototype = {
 						this.debugLog("response inconclusive, try again.");
 						getDispatch(callback,action.inconclusive);
 					}else{
-						this.debugLog("We have a value: %s, int: %d", state, parseInt(state));
-						callback(null, parseInt(state));
+						/* Edited by Tamas Gal 2018.10.22. */
+						if ( action.floatValue ) {
+							this.debugLog("We have a value: %s, no rounding", parseFloat(state));
+							callback(null, parseFloat(state)); 														
+						}
+						else {							
+							this.debugLog("We have a value: %s, int: %d", state, parseInt(state));
+							callback(null, parseInt(state));							
+						}
+						
 					}
 				}
 			}.bind(this));
@@ -390,7 +402,11 @@ HttpAdvancedAccessory.prototype = {
 			case "StatefulProgrammableSwitch": newService = new Service.StatefulProgrammableSwitch(this.name); break;
 			case "StatelessProgrammableSwitch": newService = new Service.StatelessProgrammableSwitch(this.name); break;
 			case "Switch": newService = new Service.Switch(this.name); break;
-			case "TemperatureSensor": newService = new Service.TemperatureSensor(this.name); break;
+			case "TemperatureSensor": 
+				newService = new Service.TemperatureSensor(this.name); 
+				/* Edited by Tamas Gal 2018.12.01. Overriding minValue 0 to be able to display negative temp values*/
+				newService.getCharacteristic(Characteristic.CurrentTemperature).setProps({ minValue: -100, maxValue: 100 });
+				break;
 			case "Thermostat": newService = new Service.Thermostat(this.name); break;
 			case "TimeInformation": newService = new Service.TimeInformation(this.name); break;
 			case "TunneledBTLEAccessoryService": newService = new Service.TunneledBTLEAccessoryService(this.name); break;
@@ -403,7 +419,7 @@ HttpAdvancedAccessory.prototype = {
 		var counters = [];
 		var optionCounters = [];
 
-
+		
 		for (var characteristicIndex in newService.characteristics) 
 		{
 			var characteristic = newService.characteristics[characteristicIndex];
@@ -411,6 +427,7 @@ HttpAdvancedAccessory.prototype = {
 			counters[characteristicIndex] = makeHelper(characteristic);
 			characteristic.on('get', counters[characteristicIndex].getter.bind(this))
 			characteristic.on('set', counters[characteristicIndex].setter.bind(this));
+			
 		}
 
 		for (var characteristicIndex in newService.optionalCharacteristics) 
@@ -424,7 +441,7 @@ HttpAdvancedAccessory.prototype = {
 			}
 
 			optionCounters[characteristicIndex] = makeHelper(characteristic);
-			characteristic.on('get', optionCounters[characteristicIndex].getter.bind(this))
+			characteristic.on('get', optionCounters[characteristicIndex].getter.bind(this));
 			characteristic.on('set', optionCounters[characteristicIndex].setter.bind(this));
 
 			newService.addCharacteristic(characteristic);
@@ -465,7 +482,7 @@ HttpAdvancedAccessory.prototype = {
 						});
 
 						this.statusEmitters[actionName].on(actionName, function (data) 
-						{
+						{							
 							this.debugLog(actionName + " emitter returned data: " + data);
 							this.enableSet = false;
 							this.state[actionName] = data;
